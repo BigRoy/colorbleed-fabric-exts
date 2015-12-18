@@ -1,0 +1,118 @@
+{
+  "objectType" : "Func",
+  "metadata" : {
+    "uiTextColor" : "{\n  \"r\" : 20,\n  \"g\" : 20,\n  \"b\" : 20\n  }",
+    "uiNodeColor" : "{\n  \"r\" : 121,\n  \"g\" : 134,\n  \"b\" : 143\n  }",
+    "uiTooltip" : "Build tangent space matrices for all vertices on the mesh. \n\n(Tangent and binormal are defined by the vertex order of the polygon and does not use UVs)"
+    },
+  "title" : "VertexSpaceFrames",
+  "ports" : [
+    {
+      "objectType" : "Port",
+      "nodePortType" : "Out",
+      "name" : "mesh",
+      "execPortType" : "In",
+      "typeSpec" : "PolygonMesh"
+      },
+    {
+      "objectType" : "Port",
+      "nodePortType" : "In",
+      "name" : "result",
+      "execPortType" : "Out",
+      "typeSpec" : "Mat44[]"
+      }
+    ],
+  "extDeps" : {},
+  "presetGUID" : "F1AD04046998C4C516B7DD277667D472",
+  "code" : "operator VertexBuildRefFrameTask<<<index>>>(in PolygonMesh mesh, in Vec3[] positions, io Mat44 result[]){
+
+  Mat44 m;
+  Vec3 p1 = positions[index];
+
+  LocalL16UInt32Array surroundingPoints;
+  mesh.getPointSurroundingPoints( index, false, surroundingPoints );
+  UInt32 nbNei = surroundingPoints.size();
+  if( nbNei == 0 ) 
+    return;
+  Vec3 p2 = positions[surroundingPoints.get(0)];
+  Vec3 p3 = positions[surroundingPoints.get(1)];
+
+  Vec3 dir = p2 - p1;
+  Vec3 nrm = dir.cross(p3 - p1);
+  Quat q;
+  q.setFromDirectionAndUpvector(dir, nrm);
+  m.set(p1, q.toMat33(), Vec3(1,1,1));
+  
+  result[index] = m;
+}
+
+
+dfgEntry {
+
+  Vec3 positions[] = mesh.getAllPointPositions();
+  result.resize(positions.size());
+  VertexBuildRefFrameTask<<<positions.size()>>>(mesh, positions, result);
+  
+}
+",
+  "requiredPresets" : {
+    "User.VertexSpaceFrames" : {
+      "objectType" : "Func",
+      "metadata" : {
+        "uiTextColor" : "{\n  \"r\" : 20,\n  \"g\" : 20,\n  \"b\" : 20\n  }",
+        "uiNodeColor" : "{\n  \"r\" : 121,\n  \"g\" : 134,\n  \"b\" : 143\n  }",
+        "uiTooltip" : "Build tangent space matrices for all vertices on the mesh. \n\n(Tangent and binormal are defined by the vertex order of the polygon and does not use UVs)"
+        },
+      "title" : "VertexSpaceFrames",
+      "ports" : [
+        {
+          "objectType" : "Port",
+          "nodePortType" : "Out",
+          "name" : "mesh",
+          "execPortType" : "In",
+          "typeSpec" : "PolygonMesh"
+          },
+        {
+          "objectType" : "Port",
+          "nodePortType" : "In",
+          "name" : "result",
+          "execPortType" : "Out",
+          "typeSpec" : "Mat44[]"
+          }
+        ],
+      "extDeps" : {},
+      "presetGUID" : "F1AD04046998C4C516B7DD277667D472",
+      "code" : "operator VertexBuildRefFrameTask<<<index>>>(in PolygonMesh mesh, in Vec3[] positions, io Mat44 result[]){
+
+  Mat44 m;
+  Vec3 p1 = positions[index];
+
+  LocalL16UInt32Array surroundingPoints;
+  mesh.getPointSurroundingPoints( index, false, surroundingPoints );
+  UInt32 nbNei = surroundingPoints.size();
+  if( nbNei == 0 ) 
+    return;
+  Vec3 p2 = positions[surroundingPoints.get(0)];
+  Vec3 p3 = positions[surroundingPoints.get(1)];
+
+  Vec3 dir = p2 - p1;
+  Vec3 nrm = dir.cross(p3 - p1);
+  Quat q;
+  q.setFromDirectionAndUpvector(dir, nrm);
+  m.set(p1, q.toMat33(), Vec3(1,1,1));
+  
+  result[index] = m;
+}
+
+
+dfgEntry {
+
+  Vec3 positions[] = mesh.getAllPointPositions();
+  result.resize(positions.size());
+  VertexBuildRefFrameTask<<<positions.size()>>>(mesh, positions, result);
+  
+}
+"
+      }
+    }
+  }

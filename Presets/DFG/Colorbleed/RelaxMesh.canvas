@@ -1,0 +1,150 @@
+{
+  "objectType" : "Func",
+  "metadata" : {
+    "uiTextColor" : "{\n  \"r\" : 20,\n  \"g\" : 20,\n  \"b\" : 20\n  }",
+    "uiNodeColor" : "{\n  \"r\" : 121,\n  \"g\" : 134,\n  \"b\" : 143\n  }"
+    },
+  "title" : "RelaxMesh",
+  "ports" : [
+    {
+      "objectType" : "Port",
+      "nodePortType" : "IO",
+      "name" : "mesh",
+      "execPortType" : "IO",
+      "typeSpec" : "PolygonMesh"
+      },
+    {
+      "objectType" : "Port",
+      "nodePortType" : "Out",
+      "defaultValues" : {
+        "UInt32" : 1
+        },
+      "name" : "iterations",
+      "execPortType" : "In",
+      "typeSpec" : "Size"
+      }
+    ],
+  "extDeps" : {},
+  "presetGUID" : "A13E8D8AB42BC54EB5A81FC80A8F1759",
+  "code" : "operator SmoothPosTask<<<index>>>(in Vec3[] positions, in PolygonMesh mesh, io Vec3[] result)
+{
+  //Pseudo-gaussian: center weight = 0.5, neighbor weights sum = 0.5
+  Vec3 position = positions[ index ];
+
+  LocalL16UInt32Array surroundingPoints;
+  mesh.getPointSurroundingPoints( index, false, surroundingPoints );
+  UInt32 nbNei = surroundingPoints.size();
+  if( nbNei ) {
+    Vec3 neiSum = Vec3(0,0,0);
+    for( UInt32 i = 0; i < nbNei; ++i ) {
+      UInt32 neiPt = surroundingPoints.get(i);
+      neiSum += positions[neiPt];
+    }
+    neiSum /= Scalar(nbNei);
+    position = ( position + neiSum ) * 0.5;
+    result[index] = position;
+  }  
+
+}
+
+operator SmoothPosCopyArrayTask<<<i>>>(in Vec3[] src, io Vec3[] dest)
+{
+  dest[i] = src[i];
+}
+
+dfgEntry {
+
+  Vec3 positions[] = mesh.getAllPointPositions();
+  Size size = positions.size();
+  
+  Vec3 result[];
+  result.resize(size);
+  SmoothPosCopyArrayTask<<<size>>>(positions, result);
+  
+  for(Size i=0; i<iterations; i++)
+  {
+    SmoothPosTask<<<size>>>(positions, mesh, result);
+    SmoothPosCopyArrayTask<<<size>>>(result, positions);
+  }
+  
+  mesh.setAllPointPositions(positions);
+  
+}
+",
+  "requiredPresets" : {
+    "User.RelaxMesh" : {
+      "objectType" : "Func",
+      "metadata" : {
+        "uiTextColor" : "{\n  \"r\" : 20,\n  \"g\" : 20,\n  \"b\" : 20\n  }",
+        "uiNodeColor" : "{\n  \"r\" : 121,\n  \"g\" : 134,\n  \"b\" : 143\n  }"
+        },
+      "title" : "RelaxMesh",
+      "ports" : [
+        {
+          "objectType" : "Port",
+          "nodePortType" : "IO",
+          "name" : "mesh",
+          "execPortType" : "IO",
+          "typeSpec" : "PolygonMesh"
+          },
+        {
+          "objectType" : "Port",
+          "nodePortType" : "Out",
+          "defaultValues" : {
+            "UInt32" : 1
+            },
+          "name" : "iterations",
+          "execPortType" : "In",
+          "typeSpec" : "Size"
+          }
+        ],
+      "extDeps" : {},
+      "presetGUID" : "A13E8D8AB42BC54EB5A81FC80A8F1759",
+      "code" : "operator SmoothPosTask<<<index>>>(in Vec3[] positions, in PolygonMesh mesh, io Vec3[] result)
+{
+  //Pseudo-gaussian: center weight = 0.5, neighbor weights sum = 0.5
+  Vec3 position = positions[ index ];
+
+  LocalL16UInt32Array surroundingPoints;
+  mesh.getPointSurroundingPoints( index, false, surroundingPoints );
+  UInt32 nbNei = surroundingPoints.size();
+  if( nbNei ) {
+    Vec3 neiSum = Vec3(0,0,0);
+    for( UInt32 i = 0; i < nbNei; ++i ) {
+      UInt32 neiPt = surroundingPoints.get(i);
+      neiSum += positions[neiPt];
+    }
+    neiSum /= Scalar(nbNei);
+    position = ( position + neiSum ) * 0.5;
+    result[index] = position;
+  }  
+
+}
+
+operator SmoothPosCopyArrayTask<<<i>>>(in Vec3[] src, io Vec3[] dest)
+{
+  dest[i] = src[i];
+}
+
+dfgEntry {
+
+  Vec3 positions[] = mesh.getAllPointPositions();
+  Size size = positions.size();
+  
+  Vec3 result[];
+  result.resize(size);
+  SmoothPosCopyArrayTask<<<size>>>(positions, result);
+  
+  for(Size i=0; i<iterations; i++)
+  {
+    SmoothPosTask<<<size>>>(positions, mesh, result);
+    SmoothPosCopyArrayTask<<<size>>>(result, positions);
+  }
+  
+  mesh.setAllPointPositions(positions);
+  
+}
+"
+      }
+    }
+  }

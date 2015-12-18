@@ -1,0 +1,179 @@
+
+require Math;
+require Geometry;
+
+
+object NURBSCurve {
+  private Vec4 controlPoints[];
+  private Size degree;
+  private Size knots[];
+};
+
+/// Default Constructor from Vec3 points
+function NURBSCurve(Vec3 cps[], Integer degree)
+{
+	this.degree = degree;
+
+	if (cps.size() < degree + 1)
+		throw("NURBSCurve must have at least degree + 1 number of points");
+
+	this.controlPoints.resize(cps.size());
+	for(Size i=0; i<cps.size(); i++)
+	{
+		this.controlPoints[i] = Vec4(cps[i].x, cps[i].y, cps[i].z, 1.0);
+	}
+
+	this.computeUniformKnots();
+}
+
+/// Return points on curve that are evenly distributed
+function Vec3[] NURBSCurve.samplePoints(Size num)
+{
+	// Get points between start/end
+	//calar max = this.knots[this.knots.size()-1];
+
+	Scalar step = 0.0;
+	if (num > 1)
+		step = 1.0 / Scalar(num - 1.0);
+
+	Vec3 result[];
+	result.resize(num);
+	for(Size i=0; i<num; i++)
+	{
+		result[i] = this.getPoint(i*step);
+	}
+
+	return result;
+}
+
+/// Get the u value from the 0-1 parameter
+/// \internal
+inline function Scalar NURBSCurve.uFromParam(Scalar param)
+{
+	// linear mapping t->u
+	return this.knots[0] + param * ( this.knots[this.knots.size() - 1] - this.knots[0] );
+}
+
+/// Get a point on the curve
+/// \param param Parameter on curve between 0-1
+function Vec3 NURBSCurve.getPoint(Scalar param)
+{
+	Scalar u = this.uFromParam(param);
+
+	// following results in (wx, wy, wz, w) homogeneous point
+	Vec4 hpoint = NURBSUtils_calcBSplinePoint( this.degree, this.knots, this.controlPoints, u );
+
+	// TODO: Think this could be replaced with `hpoint.makeHomogeneousVec3()`
+	if ( hpoint.t != 1.0 )
+		hpoint /= hpoint.t; // project to 3D space: (wx, wy, wz, w) -> (x, y, z, 1)
+	return hpoint.xyz();
+
+}
+
+/// Return the tangent vector at a given parameter
+/// Calculated using the NURBS Derivative of that parameter on the curve.
+function Vec3 NURBSCurve.getTangent(Scalar param, Boolean normalize) 
+{
+	Scalar u = this.knots[0] + param * (this.knots[ this.knots.size() - 1] - this.knots[0]);
+	Vec4 ders[] = NURBSUtils_calcNURBSDerivatives( this.degree, this.knots, this.controlPoints, u, 1 );
+	Vec3 tangent = ders[1].clone().xyz();
+	tangent.normalize();
+
+	if (normalize)
+		return tangent.unit();
+	else
+		return tangent;
+
+}
+
+/// TODO: Rebuild the Curve with another amounts of points or at a different degree.
+function NURBSCurve NURBSCurve.rebuildCurve(Size spans, Size degree)
+{
+	// TODO: This is actually inaccurate. The point shouldn't be taken from the curve
+	// 		 but should be sampled along the "cp" points so the shape is preserved
+	Vec3 cps[];
+	cps.resize(spans);
+	for(Size i=0; i<spans; i++)
+		cps[i] = this.getPoint(i);
+
+	return NURBSCurve(cps, degree);
+}
+
+///	Compute the knots for the NURBSCurve so they are uniformly distributed
+/// \internal
+function NURBSCurve.computeUniformKnots!()
+{
+	// TODO: This seems non-uniform in the results? Test some more!
+
+	Integer counter = 0;
+	Integer knotsSize = this.degree + this.controlPoints.size() + 1;
+	this.knots.resize(knotsSize);
+
+	for(Integer i=0; i<knotsSize; i++)
+	{
+
+		// Degree + 1 at start of 0 knots to clamp the curve
+		if (i <= this.degree)
+			this.knots[i] = 0;
+
+		// Degree + 1 at the end of the highest knots value to clamp the curve
+		else if (i > knotsSize - this.degree - 1)
+			this.knots[i] = counter;
+
+		// Otherise increase knot gradually
+		else
+			this.knots[i] = ++counter;
+
+	}
+}
+
+/// Return curve frame normal samples
+/// Based on: "Parallel Transport Approach to Curve Framing"
+function NURBSCurve.parallelFramesNormals(in Size samples,
+										 in Vec3 upVec,
+										 out Vec3 normals[] ) {
+  // TODO: Test this! :)
+  normals.resize(samples);
+  Vec3 prevNorm = upVec.unit();
+  Vec3 tangent;
+  Vec3 cross;
+  Scalar step = this.knots[this.knots.size()-1] / Scalar(samples-1);
+
+  for(Size i=0; i<samples; i++)
+  {
+  	tangent = this.getTangent(step*i, true);
+  	cross = prevNorm.cross(tangent);
+  	prevNorm = tangent.cross(cross).unit();
+  	normals[i] = prevNorm;
+  }
+}
+
+/// Return curve frame Xfo samples
+/// Based on: "Parallel Transport Approach to Curve Framing"
+function NURBSCurve.parallelFrames(in Size samples,
+								   in Vec3 upVec,
+								   out Xfo xfos[])
+{
+	// TODO: Test this! :)
+	xfos.resize(samples);
+  	Vec3 prevNorm = upVec.unit();
+  	Vec3 tangent;
+  	Vec3 normal;
+  	Vec3 cross;
+  	Vec3 pt;
+  	Scalar step = this.knots[this.knots.size()-1] / Scalar(samples-1);
+
+  	for(Size i=0; i<samples; i++)
+  	{	
+  		tangent = this.getTangent(step*i, true);
+  		cross = prevNorm.cross(tangent);
+  		prevNorm = tangent.cross(cross).unit();
+  		normal = prevNorm;
+  		pt = this.getPoint(step*i);
+
+		Quat quat;
+		quat.setFromDirectionAndUpvector(tangent, normal);
+
+		xfos[i] = Xfo(pt, quat);
+  	}
+}

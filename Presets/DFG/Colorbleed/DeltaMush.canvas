@@ -1,0 +1,1418 @@
+{
+  "objectType" : "Graph",
+  "metadata" : {
+    "uiTextColor" : "{\n  \"r\" : 20,\n  \"g\" : 20,\n  \"b\" : 20\n  }",
+    "uiNodeColor" : "{\n  \"r\" : 121,\n  \"g\" : 134,\n  \"b\" : 143\n  }",
+    "uiGraphZoom" : "{\n  \"value\" : 0.9656897187232971\n  }",
+    "uiGraphPan" : "{\n  \"x\" : -94.25686637239664,\n  \"y\" : 139.7983121477595\n  }"
+    },
+  "title" : "DeltaMush",
+  "ports" : [
+    {
+      "objectType" : "Port",
+      "nodePortType" : "IO",
+      "name" : "mesh",
+      "execPortType" : "IO"
+      },
+    {
+      "objectType" : "Port",
+      "nodePortType" : "Out",
+      "defaultValues" : {
+        "UInt32" : 0
+        },
+      "name" : "iterations",
+      "execPortType" : "In",
+      "typeSpec" : "Size"
+      },
+    {
+      "objectType" : "Port",
+      "nodePortType" : "Out",
+      "name" : "reference",
+      "execPortType" : "In",
+      "typeSpec" : "PolygonMesh"
+      }
+    ],
+  "extDeps" : {},
+  "presetGUID" : "5AF1B046AC0FDDC210D863F2C146C3AC",
+  "nodes" : [
+    {
+      "objectType" : "Inst",
+      "metadata" : {
+        "uiComment" : "Original points",
+        "uiGraphPos" : "{\"x\":118.498291015625,\"y\":491.6438598632813}",
+        "uiCommentExpanded" : "true"
+        },
+      "name" : "GetAllPointPositions_1",
+      "ports" : [
+        {
+          "objectType" : "InstPort",
+          "nodePortType" : "In",
+          "name" : "this"
+          },
+        {
+          "objectType" : "InstPort",
+          "nodePortType" : "Out",
+          "name" : "result"
+          }
+        ],
+      "executable" : "Fabric.Exts.Geometry.PolygonMesh.GetAllPointPositions",
+      "presetGUID" : "56B1293D085ABF3878186A364759126F"
+      },
+    {
+      "objectType" : "Inst",
+      "metadata" : {
+        "uiGraphPos" : "{\"x\":917.364990234375,\"y\":450.707275390625}"
+        },
+      "name" : "InverseArray_1",
+      "ports" : [
+        {
+          "objectType" : "InstPort",
+          "nodePortType" : "In",
+          "name" : "this"
+          },
+        {
+          "objectType" : "InstPort",
+          "nodePortType" : "Out",
+          "name" : "result"
+          }
+        ],
+      "executable" : "Fabric.Exts.Math.Func.InverseArray",
+      "presetGUID" : "B8922E10BA9ED2EB40A0009C880C5928"
+      },
+    {
+      "objectType" : "Inst",
+      "metadata" : {
+        "uiGraphPos" : "{\"x\":335.8818359375,\"y\":449.2962646484375}"
+        },
+      "name" : "Clone_3",
+      "ports" : [
+        {
+          "objectType" : "InstPort",
+          "nodePortType" : "In",
+          "name" : "value"
+          },
+        {
+          "objectType" : "InstPort",
+          "nodePortType" : "Out",
+          "name" : "clonedValue"
+          }
+        ],
+      "executable" : "Fabric.Core.Data.Clone",
+      "presetGUID" : "30401D7851DEFCFA5C46EB3926DD8BAD"
+      },
+    {
+      "objectType" : "Inst",
+      "metadata" : {
+        "uiGraphPos" : "{\"x\":1061.001708984375,\"y\":464.2711181640625}"
+        },
+      "name" : "MultiplyVector3Array_1",
+      "ports" : [
+        {
+          "objectType" : "InstPort",
+          "nodePortType" : "In",
+          "name" : "this"
+          },
+        {
+          "objectType" : "InstPort",
+          "nodePortType" : "In",
+          "name" : "other"
+          },
+        {
+          "objectType" : "InstPort",
+          "nodePortType" : "Out",
+          "name" : "result"
+          }
+        ],
+      "executable" : "Fabric.Exts.Math.Mat44.MultiplyVector3Array",
+      "presetGUID" : "456D703FEC5F5239B5B175ED27732EC1"
+      },
+    {
+      "objectType" : "Inst",
+      "metadata" : {
+        "uiGraphPos" : "{\"x\":1364.340576171875,\"y\":284.5648803710938}"
+        },
+      "name" : "MultiplyVector3Array_2",
+      "ports" : [
+        {
+          "objectType" : "InstPort",
+          "nodePortType" : "In",
+          "name" : "this"
+          },
+        {
+          "objectType" : "InstPort",
+          "nodePortType" : "In",
+          "name" : "other"
+          },
+        {
+          "objectType" : "InstPort",
+          "nodePortType" : "Out",
+          "name" : "result"
+          }
+        ],
+      "executable" : "Fabric.Exts.Math.Mat44.MultiplyVector3Array",
+      "presetGUID" : "456D703FEC5F5239B5B175ED27732EC1"
+      },
+    {
+      "objectType" : "Inst",
+      "metadata" : {
+        "uiGraphPos" : "{\"x\":1546.144165039063,\"y\":290.711669921875}"
+        },
+      "name" : "SetAllPointPositions_1",
+      "ports" : [
+        {
+          "objectType" : "InstPort",
+          "nodePortType" : "IO",
+          "name" : "this"
+          },
+        {
+          "objectType" : "InstPort",
+          "nodePortType" : "In",
+          "name" : "positions"
+          }
+        ],
+      "executable" : "Fabric.Exts.Geometry.PolygonMesh.SetAllPointPositions",
+      "presetGUID" : "126C60438EED6E8D6CEDDDD52A6F2EBD"
+      },
+    {
+      "objectType" : "User",
+      "metadata" : {
+        "uiTitle" : "ComputeOriginalRefDeltaFrame",
+        "uiComment" : "Compute the delta between the relaxed frame and the original position on the \"reference\" mesh that acts as base",
+        "uiGraphPos" : "{\"x\":104.84228515625,\"y\":412.2899169921875}",
+        "uiNodeColor" : "{\n  \"r\" : 121,\n  \"g\" : 134,\n  \"b\" : 143\n  }",
+        "uiTextColor" : "{\n  \"r\" : 20,\n  \"g\" : 20,\n  \"b\" : 20\n  }",
+        "uiCommentExpanded" : "true",
+        "uiGraphSize" : "{\"w\":1273.441528320313,\"h\":169.5098724365234}"
+        },
+      "name" : "backDrop_4",
+      "ports" : []
+      },
+    {
+      "objectType" : "User",
+      "metadata" : {
+        "uiTitle" : "ApplyDeltas",
+        "uiComment" : "Apply the original \"relax\" delta (from reference pose) to the relaxed frame on the current mesh",
+        "uiGraphPos" : "{\"x\":985.978759765625,\"y\":229.7965087890625}",
+        "uiNodeColor" : "{\n  \"r\" : 121,\n  \"g\" : 134,\n  \"b\" : 143\n  }",
+        "uiTextColor" : "{\n  \"r\" : 20,\n  \"g\" : 20,\n  \"b\" : 20\n  }",
+        "uiCommentExpanded" : "true",
+        "uiGraphSize" : "{\"w\":761.149169921875,\"h\":173.7201843261719}"
+        },
+      "name" : "backDrop_5",
+      "ports" : []
+      },
+    {
+      "objectType" : "Inst",
+      "metadata" : {
+        "uiComment" : "Iterations",
+        "uiGraphPos" : "{\"x\":235.0,\"y\":241.0}",
+        "uiCommentExpanded" : "true"
+        },
+      "name" : "PassIn_1",
+      "ports" : [
+        {
+          "objectType" : "InstPort",
+          "nodePortType" : "In",
+          "name" : "value"
+          }
+        ],
+      "executable" : "Fabric.Core.Data.PassIn",
+      "presetGUID" : "3C33E1B42A2643A035DBAB718554227D"
+      },
+    {
+      "objectType" : "Inst",
+      "metadata" : {
+        "uiGraphPos" : "{\"x\":1238.282592773438,\"y\":480.4508666992188}"
+        },
+      "name" : "Cache_1",
+      "ports" : [
+        {
+          "objectType" : "InstPort",
+          "nodePortType" : "In",
+          "name" : "value"
+          }
+        ],
+      "executable" : "Fabric.Core.Data.Cache",
+      "presetGUID" : "D903AFD981FE9214C69943F542D5FD60"
+      },
+    {
+      "objectType" : "Inst",
+      "metadata" : {
+        "uiGraphPos" : "{\"x\":1798.733764648438,\"y\":-129.2469787597656}"
+        },
+      "name" : "If_1",
+      "ports" : [
+        {
+          "objectType" : "InstPort",
+          "nodePortType" : "In",
+          "name" : "cond"
+          },
+        {
+          "objectType" : "InstPort",
+          "nodePortType" : "In",
+          "name" : "if_true"
+          },
+        {
+          "objectType" : "InstPort",
+          "nodePortType" : "In",
+          "name" : "if_false"
+          },
+        {
+          "objectType" : "InstPort",
+          "nodePortType" : "Out",
+          "name" : "result"
+          }
+        ],
+      "executable" : "Fabric.Core.Control.If",
+      "presetGUID" : "3182A478A21643455D549E483D35F831"
+      },
+    {
+      "objectType" : "Inst",
+      "metadata" : {
+        "uiGraphPos" : "{\"x\":1660.292236328125,\"y\":-133.8235473632813}"
+        },
+      "name" : "Le_1",
+      "ports" : [
+        {
+          "objectType" : "InstPort",
+          "nodePortType" : "In",
+          "name" : "lhs"
+          },
+        {
+          "objectType" : "InstPort",
+          "nodePortType" : "In",
+          "name" : "rhs"
+          },
+        {
+          "objectType" : "InstPort",
+          "nodePortType" : "Out",
+          "name" : "result"
+          }
+        ],
+      "executable" : "Fabric.Core.Logic.Le",
+      "presetGUID" : "29580C848A777A42608B45D8DF02D37C"
+      },
+    {
+      "objectType" : "Inst",
+      "metadata" : {
+        "uiGraphPos" : "{\"x\":1008.871459960938,\"y\":294.2992553710938}"
+        },
+      "name" : "RelaxMesh_1",
+      "ports" : [
+        {
+          "objectType" : "InstPort",
+          "nodePortType" : "IO",
+          "name" : "mesh"
+          },
+        {
+          "objectType" : "InstPort",
+          "nodePortType" : "In",
+          "name" : "iterations"
+          }
+        ],
+      "executable" : "Colorbleed.RelaxMesh",
+      "presetGUID" : "A13E8D8AB42BC54EB5A81FC80A8F1759"
+      },
+    {
+      "objectType" : "Inst",
+      "metadata" : {
+        "uiGraphPos" : "{\"x\":1151.7744140625,\"y\":291.1923828125}"
+        },
+      "name" : "VertexSpaceFrames_2",
+      "ports" : [
+        {
+          "objectType" : "InstPort",
+          "nodePortType" : "In",
+          "name" : "mesh"
+          },
+        {
+          "objectType" : "InstPort",
+          "nodePortType" : "Out",
+          "name" : "result"
+          }
+        ],
+      "executable" : "Colorbleed.VertexSpaceFrames",
+      "presetGUID" : "F1AD04046998C4C516B7DD277667D472"
+      },
+    {
+      "objectType" : "Inst",
+      "metadata" : {
+        "uiGraphPos" : "{\"x\":529.421630859375,\"y\":459.9839477539063}"
+        },
+      "name" : "RelaxMesh_2",
+      "ports" : [
+        {
+          "objectType" : "InstPort",
+          "nodePortType" : "IO",
+          "name" : "mesh"
+          },
+        {
+          "objectType" : "InstPort",
+          "nodePortType" : "In",
+          "name" : "iterations"
+          }
+        ],
+      "executable" : "Colorbleed.RelaxMesh",
+      "presetGUID" : "A13E8D8AB42BC54EB5A81FC80A8F1759"
+      },
+    {
+      "objectType" : "Inst",
+      "metadata" : {
+        "uiGraphPos" : "{\"x\":691.9993286132813,\"y\":465.1615295410156}"
+        },
+      "name" : "VertexSpaceFrames_1",
+      "ports" : [
+        {
+          "objectType" : "InstPort",
+          "nodePortType" : "In",
+          "name" : "mesh"
+          },
+        {
+          "objectType" : "InstPort",
+          "nodePortType" : "Out",
+          "name" : "result"
+          }
+        ],
+      "executable" : "Colorbleed.VertexSpaceFrames",
+      "presetGUID" : "F1AD04046998C4C516B7DD277667D472"
+      }
+    ],
+  "connections" : {
+    "mesh" : [
+      "If_1.if_true",
+      "RelaxMesh_1.mesh"
+      ],
+    "iterations" : [
+      "PassIn_1.value",
+      "Le_1.lhs"
+      ],
+    "reference" : [
+      "GetAllPointPositions_1.this"
+      ],
+    "GetAllPointPositions_1.this" : [
+      "Clone_3.value"
+      ],
+    "GetAllPointPositions_1.result" : [
+      "MultiplyVector3Array_1.other"
+      ],
+    "InverseArray_1.result" : [
+      "MultiplyVector3Array_1.this"
+      ],
+    "Clone_3.clonedValue" : [
+      "RelaxMesh_2.mesh"
+      ],
+    "MultiplyVector3Array_1.result" : [
+      "Cache_1.value"
+      ],
+    "MultiplyVector3Array_2.result" : [
+      "SetAllPointPositions_1.positions"
+      ],
+    "SetAllPointPositions_1.this" : [
+      "If_1.if_false"
+      ],
+    "PassIn_1.value" : [
+      "RelaxMesh_1.iterations",
+      "RelaxMesh_2.iterations"
+      ],
+    "Cache_1.value" : [
+      "MultiplyVector3Array_2.other"
+      ],
+    "If_1.result" : [
+      "mesh"
+      ],
+    "Le_1.result" : [
+      "If_1.cond"
+      ],
+    "RelaxMesh_1.mesh" : [
+      "VertexSpaceFrames_2.mesh"
+      ],
+    "VertexSpaceFrames_2.mesh" : [
+      "SetAllPointPositions_1.this"
+      ],
+    "VertexSpaceFrames_2.result" : [
+      "MultiplyVector3Array_2.this"
+      ],
+    "RelaxMesh_2.mesh" : [
+      "VertexSpaceFrames_1.mesh"
+      ],
+    "VertexSpaceFrames_1.result" : [
+      "InverseArray_1.this"
+      ]
+    },
+  "requiredPresets" : {
+    "Colorbleed.DeltaMush" : {
+      "objectType" : "Graph",
+      "metadata" : {
+        "uiTextColor" : "{\n  \"r\" : 20,\n  \"g\" : 20,\n  \"b\" : 20\n  }",
+        "uiNodeColor" : "{\n  \"r\" : 121,\n  \"g\" : 134,\n  \"b\" : 143\n  }",
+        "uiGraphZoom" : "{\n  \"value\" : 0.9656897187232971\n  }",
+        "uiGraphPan" : "{\n  \"x\" : -94.25686637239664,\n  \"y\" : 139.7983121477595\n  }"
+        },
+      "title" : "DeltaMush",
+      "ports" : [
+        {
+          "objectType" : "Port",
+          "nodePortType" : "IO",
+          "name" : "mesh",
+          "execPortType" : "IO"
+          },
+        {
+          "objectType" : "Port",
+          "nodePortType" : "Out",
+          "defaultValues" : {
+            "UInt32" : 0
+            },
+          "name" : "iterations",
+          "execPortType" : "In",
+          "typeSpec" : "Size"
+          },
+        {
+          "objectType" : "Port",
+          "nodePortType" : "Out",
+          "name" : "reference",
+          "execPortType" : "In",
+          "typeSpec" : "PolygonMesh"
+          }
+        ],
+      "extDeps" : {},
+      "presetGUID" : "5AF1B046AC0FDDC210D863F2C146C3AC",
+      "nodes" : [
+        {
+          "objectType" : "Inst",
+          "metadata" : {
+            "uiComment" : "Original points",
+            "uiGraphPos" : "{\"x\":118.498291015625,\"y\":491.6438598632813}",
+            "uiCommentExpanded" : "true"
+            },
+          "name" : "GetAllPointPositions_1",
+          "ports" : [
+            {
+              "objectType" : "InstPort",
+              "nodePortType" : "In",
+              "name" : "this"
+              },
+            {
+              "objectType" : "InstPort",
+              "nodePortType" : "Out",
+              "name" : "result"
+              }
+            ],
+          "executable" : "Fabric.Exts.Geometry.PolygonMesh.GetAllPointPositions",
+          "presetGUID" : "56B1293D085ABF3878186A364759126F"
+          },
+        {
+          "objectType" : "Inst",
+          "metadata" : {
+            "uiGraphPos" : "{\"x\":917.364990234375,\"y\":450.707275390625}"
+            },
+          "name" : "InverseArray_1",
+          "ports" : [
+            {
+              "objectType" : "InstPort",
+              "nodePortType" : "In",
+              "name" : "this"
+              },
+            {
+              "objectType" : "InstPort",
+              "nodePortType" : "Out",
+              "name" : "result"
+              }
+            ],
+          "executable" : "Fabric.Exts.Math.Func.InverseArray",
+          "presetGUID" : "B8922E10BA9ED2EB40A0009C880C5928"
+          },
+        {
+          "objectType" : "Inst",
+          "metadata" : {
+            "uiGraphPos" : "{\"x\":335.8818359375,\"y\":449.2962646484375}"
+            },
+          "name" : "Clone_3",
+          "ports" : [
+            {
+              "objectType" : "InstPort",
+              "nodePortType" : "In",
+              "name" : "value"
+              },
+            {
+              "objectType" : "InstPort",
+              "nodePortType" : "Out",
+              "name" : "clonedValue"
+              }
+            ],
+          "executable" : "Fabric.Core.Data.Clone",
+          "presetGUID" : "30401D7851DEFCFA5C46EB3926DD8BAD"
+          },
+        {
+          "objectType" : "Inst",
+          "metadata" : {
+            "uiGraphPos" : "{\"x\":1061.001708984375,\"y\":464.2711181640625}"
+            },
+          "name" : "MultiplyVector3Array_1",
+          "ports" : [
+            {
+              "objectType" : "InstPort",
+              "nodePortType" : "In",
+              "name" : "this"
+              },
+            {
+              "objectType" : "InstPort",
+              "nodePortType" : "In",
+              "name" : "other"
+              },
+            {
+              "objectType" : "InstPort",
+              "nodePortType" : "Out",
+              "name" : "result"
+              }
+            ],
+          "executable" : "Fabric.Exts.Math.Mat44.MultiplyVector3Array",
+          "presetGUID" : "456D703FEC5F5239B5B175ED27732EC1"
+          },
+        {
+          "objectType" : "Inst",
+          "metadata" : {
+            "uiGraphPos" : "{\"x\":1364.340576171875,\"y\":284.5648803710938}"
+            },
+          "name" : "MultiplyVector3Array_2",
+          "ports" : [
+            {
+              "objectType" : "InstPort",
+              "nodePortType" : "In",
+              "name" : "this"
+              },
+            {
+              "objectType" : "InstPort",
+              "nodePortType" : "In",
+              "name" : "other"
+              },
+            {
+              "objectType" : "InstPort",
+              "nodePortType" : "Out",
+              "name" : "result"
+              }
+            ],
+          "executable" : "Fabric.Exts.Math.Mat44.MultiplyVector3Array",
+          "presetGUID" : "456D703FEC5F5239B5B175ED27732EC1"
+          },
+        {
+          "objectType" : "Inst",
+          "metadata" : {
+            "uiGraphPos" : "{\"x\":1546.144165039063,\"y\":290.711669921875}"
+            },
+          "name" : "SetAllPointPositions_1",
+          "ports" : [
+            {
+              "objectType" : "InstPort",
+              "nodePortType" : "IO",
+              "name" : "this"
+              },
+            {
+              "objectType" : "InstPort",
+              "nodePortType" : "In",
+              "name" : "positions"
+              }
+            ],
+          "executable" : "Fabric.Exts.Geometry.PolygonMesh.SetAllPointPositions",
+          "presetGUID" : "126C60438EED6E8D6CEDDDD52A6F2EBD"
+          },
+        {
+          "objectType" : "User",
+          "metadata" : {
+            "uiTitle" : "ComputeOriginalRefDeltaFrame",
+            "uiComment" : "Compute the delta between the relaxed frame and the original position on the \"reference\" mesh that acts as base",
+            "uiGraphPos" : "{\"x\":104.84228515625,\"y\":412.2899169921875}",
+            "uiNodeColor" : "{\n  \"r\" : 121,\n  \"g\" : 134,\n  \"b\" : 143\n  }",
+            "uiTextColor" : "{\n  \"r\" : 20,\n  \"g\" : 20,\n  \"b\" : 20\n  }",
+            "uiCommentExpanded" : "true",
+            "uiGraphSize" : "{\"w\":1273.441528320313,\"h\":169.5098724365234}"
+            },
+          "name" : "backDrop_4",
+          "ports" : []
+          },
+        {
+          "objectType" : "User",
+          "metadata" : {
+            "uiTitle" : "ApplyDeltas",
+            "uiComment" : "Apply the original \"relax\" delta (from reference pose) to the relaxed frame on the current mesh",
+            "uiGraphPos" : "{\"x\":985.978759765625,\"y\":229.7965087890625}",
+            "uiNodeColor" : "{\n  \"r\" : 121,\n  \"g\" : 134,\n  \"b\" : 143\n  }",
+            "uiTextColor" : "{\n  \"r\" : 20,\n  \"g\" : 20,\n  \"b\" : 20\n  }",
+            "uiCommentExpanded" : "true",
+            "uiGraphSize" : "{\"w\":761.149169921875,\"h\":173.7201843261719}"
+            },
+          "name" : "backDrop_5",
+          "ports" : []
+          },
+        {
+          "objectType" : "Inst",
+          "metadata" : {
+            "uiComment" : "Iterations",
+            "uiGraphPos" : "{\"x\":235.0,\"y\":241.0}",
+            "uiCommentExpanded" : "true"
+            },
+          "name" : "PassIn_1",
+          "ports" : [
+            {
+              "objectType" : "InstPort",
+              "nodePortType" : "In",
+              "name" : "value"
+              }
+            ],
+          "executable" : "Fabric.Core.Data.PassIn",
+          "presetGUID" : "3C33E1B42A2643A035DBAB718554227D"
+          },
+        {
+          "objectType" : "Inst",
+          "metadata" : {
+            "uiGraphPos" : "{\"x\":1238.282592773438,\"y\":480.4508666992188}"
+            },
+          "name" : "Cache_1",
+          "ports" : [
+            {
+              "objectType" : "InstPort",
+              "nodePortType" : "In",
+              "name" : "value"
+              }
+            ],
+          "executable" : "Fabric.Core.Data.Cache",
+          "presetGUID" : "D903AFD981FE9214C69943F542D5FD60"
+          },
+        {
+          "objectType" : "Inst",
+          "metadata" : {
+            "uiGraphPos" : "{\"x\":1798.733764648438,\"y\":-129.2469787597656}"
+            },
+          "name" : "If_1",
+          "ports" : [
+            {
+              "objectType" : "InstPort",
+              "nodePortType" : "In",
+              "name" : "cond"
+              },
+            {
+              "objectType" : "InstPort",
+              "nodePortType" : "In",
+              "name" : "if_true"
+              },
+            {
+              "objectType" : "InstPort",
+              "nodePortType" : "In",
+              "name" : "if_false"
+              },
+            {
+              "objectType" : "InstPort",
+              "nodePortType" : "Out",
+              "name" : "result"
+              }
+            ],
+          "executable" : "Fabric.Core.Control.If",
+          "presetGUID" : "3182A478A21643455D549E483D35F831"
+          },
+        {
+          "objectType" : "Inst",
+          "metadata" : {
+            "uiGraphPos" : "{\"x\":1660.292236328125,\"y\":-133.8235473632813}"
+            },
+          "name" : "Le_1",
+          "ports" : [
+            {
+              "objectType" : "InstPort",
+              "nodePortType" : "In",
+              "name" : "lhs"
+              },
+            {
+              "objectType" : "InstPort",
+              "nodePortType" : "In",
+              "name" : "rhs"
+              },
+            {
+              "objectType" : "InstPort",
+              "nodePortType" : "Out",
+              "name" : "result"
+              }
+            ],
+          "executable" : "Fabric.Core.Logic.Le",
+          "presetGUID" : "29580C848A777A42608B45D8DF02D37C"
+          },
+        {
+          "objectType" : "Inst",
+          "metadata" : {
+            "uiGraphPos" : "{\"x\":1008.871459960938,\"y\":294.2992553710938}"
+            },
+          "name" : "RelaxMesh_1",
+          "ports" : [
+            {
+              "objectType" : "InstPort",
+              "nodePortType" : "IO",
+              "name" : "mesh"
+              },
+            {
+              "objectType" : "InstPort",
+              "nodePortType" : "In",
+              "name" : "iterations"
+              }
+            ],
+          "executable" : "Colorbleed.RelaxMesh",
+          "presetGUID" : "A13E8D8AB42BC54EB5A81FC80A8F1759"
+          },
+        {
+          "objectType" : "Inst",
+          "metadata" : {
+            "uiGraphPos" : "{\"x\":1151.7744140625,\"y\":291.1923828125}"
+            },
+          "name" : "VertexSpaceFrames_2",
+          "ports" : [
+            {
+              "objectType" : "InstPort",
+              "nodePortType" : "In",
+              "name" : "mesh"
+              },
+            {
+              "objectType" : "InstPort",
+              "nodePortType" : "Out",
+              "name" : "result"
+              }
+            ],
+          "executable" : "Colorbleed.VertexSpaceFrames",
+          "presetGUID" : "F1AD04046998C4C516B7DD277667D472"
+          },
+        {
+          "objectType" : "Inst",
+          "metadata" : {
+            "uiGraphPos" : "{\"x\":529.421630859375,\"y\":459.9839477539063}"
+            },
+          "name" : "RelaxMesh_2",
+          "ports" : [
+            {
+              "objectType" : "InstPort",
+              "nodePortType" : "IO",
+              "name" : "mesh"
+              },
+            {
+              "objectType" : "InstPort",
+              "nodePortType" : "In",
+              "name" : "iterations"
+              }
+            ],
+          "executable" : "Colorbleed.RelaxMesh",
+          "presetGUID" : "A13E8D8AB42BC54EB5A81FC80A8F1759"
+          },
+        {
+          "objectType" : "Inst",
+          "metadata" : {
+            "uiGraphPos" : "{\"x\":691.9993286132813,\"y\":465.1615295410156}"
+            },
+          "name" : "VertexSpaceFrames_1",
+          "ports" : [
+            {
+              "objectType" : "InstPort",
+              "nodePortType" : "In",
+              "name" : "mesh"
+              },
+            {
+              "objectType" : "InstPort",
+              "nodePortType" : "Out",
+              "name" : "result"
+              }
+            ],
+          "executable" : "Colorbleed.VertexSpaceFrames",
+          "presetGUID" : "F1AD04046998C4C516B7DD277667D472"
+          }
+        ],
+      "connections" : {
+        "mesh" : [
+          "If_1.if_true",
+          "RelaxMesh_1.mesh"
+          ],
+        "iterations" : [
+          "PassIn_1.value",
+          "Le_1.lhs"
+          ],
+        "reference" : [
+          "GetAllPointPositions_1.this"
+          ],
+        "GetAllPointPositions_1.this" : [
+          "Clone_3.value"
+          ],
+        "GetAllPointPositions_1.result" : [
+          "MultiplyVector3Array_1.other"
+          ],
+        "InverseArray_1.result" : [
+          "MultiplyVector3Array_1.this"
+          ],
+        "Clone_3.clonedValue" : [
+          "RelaxMesh_2.mesh"
+          ],
+        "MultiplyVector3Array_1.result" : [
+          "Cache_1.value"
+          ],
+        "MultiplyVector3Array_2.result" : [
+          "SetAllPointPositions_1.positions"
+          ],
+        "SetAllPointPositions_1.this" : [
+          "If_1.if_false"
+          ],
+        "PassIn_1.value" : [
+          "RelaxMesh_1.iterations",
+          "RelaxMesh_2.iterations"
+          ],
+        "Cache_1.value" : [
+          "MultiplyVector3Array_2.other"
+          ],
+        "If_1.result" : [
+          "mesh"
+          ],
+        "Le_1.result" : [
+          "If_1.cond"
+          ],
+        "RelaxMesh_1.mesh" : [
+          "VertexSpaceFrames_2.mesh"
+          ],
+        "VertexSpaceFrames_2.mesh" : [
+          "SetAllPointPositions_1.this"
+          ],
+        "VertexSpaceFrames_2.result" : [
+          "MultiplyVector3Array_2.this"
+          ],
+        "RelaxMesh_2.mesh" : [
+          "VertexSpaceFrames_1.mesh"
+          ],
+        "VertexSpaceFrames_1.result" : [
+          "InverseArray_1.this"
+          ]
+        }
+      },
+    "Fabric.Exts.Geometry.PolygonMesh.GetAllPointPositions" : {
+      "objectType" : "Func",
+      "metadata" : {
+        "uiDocUrl" : "http://docs.fabric-engine.com/FabricEngine/2.0.1/HTML/KLExtensionsGuide/Geometry/PolygonMesh.html",
+        "uiTooltip" : "Returns all point positions\n\n Supported by PolygonMesh"
+        },
+      "title" : "GetAllPointPositions",
+      "ports" : [
+        {
+          "objectType" : "Port",
+          "metadata" : {
+            "uiColor" : "{\n  \"r\" : 51,\n  \"g\" : 1,\n  \"b\" : 106\n  }"
+            },
+          "nodePortType" : "Out",
+          "name" : "this",
+          "execPortType" : "In",
+          "typeSpec" : "PolygonMesh"
+          },
+        {
+          "objectType" : "Port",
+          "metadata" : {
+            "uiColor" : "{\n  \"r\" : 255,\n  \"g\" : 242,\n  \"b\" : 0\n  }"
+            },
+          "nodePortType" : "In",
+          "name" : "result",
+          "execPortType" : "Out",
+          "typeSpec" : "Vec3[]"
+          }
+        ],
+      "extDeps" : {
+        "Geometry" : "*"
+        },
+      "presetGUID" : "56B1293D085ABF3878186A364759126F",
+      "code" : "require Geometry;
+
+dfgEntry {
+  result = this.getAllPointPositions();
+}
+"
+      },
+    "Fabric.Exts.Math.Func.InverseArray" : {
+      "objectType" : "Func",
+      "metadata" : {
+        "uiNodeColor" : "{\n  \"r\" : 99,\n  \"g\" : 129,\n  \"b\" : 92\n  }",
+        "uiDocUrl" : "http://docs.fabric-engine.com/FabricEngine/2.0.1/HTML/KLExtensionsGuide/Math/Vec2.html",
+        "uiTooltip" : "Returns the inversed version of this vector\n\n Supported by Vec2,Vec2_d,Vec2_i,Vec3,Vec3_d,Vec3_i,Vec4,Vec4_d,Vec4_i,Mat22,Mat22_d,Mat22_i,Mat33,Mat33_d,Mat33_i,Mat44,Mat44_d,Mat44_i,Quat,Quat_d,Quat_i,Xfo"
+        },
+      "title" : "Inverse[]",
+      "ports" : [
+        {
+          "objectType" : "Port",
+          "nodePortType" : "Out",
+          "defaultValues" : {
+            "Vec2[]" : [
+              {
+                "x" : 0,
+                "y" : 0
+                }
+              ]
+            },
+          "name" : "this",
+          "execPortType" : "In",
+          "typeSpec" : "$TYPE$[]"
+          },
+        {
+          "objectType" : "Port",
+          "nodePortType" : "In",
+          "name" : "result",
+          "execPortType" : "Out",
+          "typeSpec" : "$TYPE$[]"
+          }
+        ],
+      "extDeps" : {
+        "Math" : "*"
+        },
+      "presetGUID" : "B8922E10BA9ED2EB40A0009C880C5928",
+      "code" : "require Math;
+
+operator Math_Vec2_inverse_task<<<index>>>(
+  io $TYPE$[] result
+, in $TYPE$[] this
+) {
+  result[index] = this[index < this.size() ? index : this.size() - 1].inverse();
+}
+
+dfgEntry {
+  if( this.size() == 0) return;
+  Size task_size = this.size();
+  result.resize(task_size);
+  if(task_size < 10000 /* pex margin */) {
+    for(Size index = 0; index < task_size; index++) {
+      Math_Vec2_inverse_task(index, result, this);
+    }
+  } else {
+    Math_Vec2_inverse_task<<<task_size>>>(result, this);
+  }
+}
+"
+      },
+    "Fabric.Core.Data.Clone" : {
+      "objectType" : "Func",
+      "metadata" : {
+        "uiNodeColor" : "{\n  \"r\" : 214,\n  \"g\" : 191,\n  \"b\" : 103\n  }",
+        "uiHeaderColor" : "{\n  \"r\" : 188,\n  \"g\" : 129,\n  \"b\" : 83\n  }"
+        },
+      "title" : "Clone",
+      "ports" : [
+        {
+          "objectType" : "Port",
+          "nodePortType" : "Out",
+          "name" : "value",
+          "execPortType" : "In",
+          "typeSpec" : "$TYPE$"
+          },
+        {
+          "objectType" : "Port",
+          "nodePortType" : "In",
+          "name" : "clonedValue",
+          "execPortType" : "Out",
+          "typeSpec" : "$TYPE$"
+          }
+        ],
+      "extDeps" : {},
+      "presetGUID" : "30401D7851DEFCFA5C46EB3926DD8BAD",
+      "code" : "dfgEntry {
+  clonedValue = value.clone();
+}
+"
+      },
+    "Fabric.Exts.Math.Mat44.MultiplyVector3Array" : {
+      "objectType" : "Func",
+      "metadata" : {
+        "uiNodeColor" : "{\n  \"r\" : 99,\n  \"g\" : 129,\n  \"b\" : 92\n  }",
+        "uiDocUrl" : "http://docs.fabric-engine.com/FabricEngine/2.0.1/HTML/KLExtensionsGuide/Math/Mat44.html",
+        "uiTooltip" : "Returns the product of this matrix and a Vec3\n\n Supported by Mat44"
+        },
+      "title" : "MultiplyVector3[]",
+      "ports" : [
+        {
+          "objectType" : "Port",
+          "metadata" : {
+            "uiColor" : "{\n  \"r\" : 249,\n  \"g\" : 157,\n  \"b\" : 28\n  }"
+            },
+          "nodePortType" : "Out",
+          "defaultValues" : {
+            "Mat44[]" : [
+              {
+                "row0" : {
+                  "x" : 1,
+                  "y" : 0,
+                  "z" : 0,
+                  "t" : 0
+                  },
+                "row1" : {
+                  "x" : 0,
+                  "y" : 1,
+                  "z" : 0,
+                  "t" : 0
+                  },
+                "row2" : {
+                  "x" : 0,
+                  "y" : 0,
+                  "z" : 1,
+                  "t" : 0
+                  },
+                "row3" : {
+                  "x" : 0,
+                  "y" : 0,
+                  "z" : 0,
+                  "t" : 1
+                  }
+                }
+              ]
+            },
+          "name" : "this",
+          "execPortType" : "In",
+          "typeSpec" : "Mat44[]"
+          },
+        {
+          "objectType" : "Port",
+          "metadata" : {
+            "uiColor" : "{\n  \"r\" : 255,\n  \"g\" : 242,\n  \"b\" : 0\n  }"
+            },
+          "nodePortType" : "Out",
+          "defaultValues" : {
+            "Vec3[]" : [
+              {
+                "x" : 0,
+                "y" : 0,
+                "z" : 0
+                }
+              ]
+            },
+          "name" : "other",
+          "execPortType" : "In",
+          "typeSpec" : "Vec3[]"
+          },
+        {
+          "objectType" : "Port",
+          "metadata" : {
+            "uiColor" : "{\n  \"r\" : 255,\n  \"g\" : 242,\n  \"b\" : 0\n  }"
+            },
+          "nodePortType" : "In",
+          "name" : "result",
+          "execPortType" : "Out",
+          "typeSpec" : "Vec3[]"
+          }
+        ],
+      "extDeps" : {
+        "Math" : "*"
+        },
+      "presetGUID" : "456D703FEC5F5239B5B175ED27732EC1",
+      "code" : "require Math;
+
+operator Math_Mat44_multiplyVector3_task<<<index>>>(
+  io Vec3[] result
+, in Mat44[] this
+, in Vec3[] other
+) {
+  result[index] = this[index < this.size() ? index : this.size() - 1].multiplyVector3(other[index < other.size() ? index : other.size() - 1]);
+}
+
+dfgEntry {
+  if( this.size() == 0) return;
+  if( other.size() == 0) return;
+  Size task_size = this.size();
+  if(task_size < other.size()) task_size = other.size();
+  result.resize(task_size);
+  if(task_size < 10000 /* pex margin */) {
+    for(Size index = 0; index < task_size; index++) {
+      Math_Mat44_multiplyVector3_task(index, result, this, other);
+    }
+  } else {
+    Math_Mat44_multiplyVector3_task<<<task_size>>>(result, this, other);
+  }
+}
+"
+      },
+    "Fabric.Exts.Geometry.PolygonMesh.SetAllPointPositions" : {
+      "objectType" : "Func",
+      "metadata" : {
+        "uiDocUrl" : "http://docs.fabric-engine.com/FabricEngine/2.0.1/HTML/KLExtensionsGuide/Geometry/PolygonMesh.html",
+        "uiTooltip" : "Sets all point positions\n\n Supported by PolygonMesh"
+        },
+      "title" : "SetAllPointPositions",
+      "ports" : [
+        {
+          "objectType" : "Port",
+          "metadata" : {
+            "uiColor" : "{\n  \"r\" : 51,\n  \"g\" : 1,\n  \"b\" : 106\n  }"
+            },
+          "nodePortType" : "IO",
+          "name" : "this",
+          "execPortType" : "IO",
+          "typeSpec" : "PolygonMesh"
+          },
+        {
+          "objectType" : "Port",
+          "metadata" : {
+            "uiColor" : "{\n  \"r\" : 255,\n  \"g\" : 242,\n  \"b\" : 0\n  }"
+            },
+          "nodePortType" : "Out",
+          "name" : "positions",
+          "execPortType" : "In",
+          "typeSpec" : "Vec3[]"
+          }
+        ],
+      "extDeps" : {
+        "Geometry" : "*"
+        },
+      "presetGUID" : "126C60438EED6E8D6CEDDDD52A6F2EBD",
+      "code" : "require Geometry;
+
+dfgEntry {
+  this.setAllPointPositions(positions);
+}
+"
+      },
+    "Fabric.Core.Data.PassIn" : {
+      "objectType" : "Func",
+      "metadata" : {
+        "uiNodeColor" : "{\n  \"r\" : 214,\n  \"g\" : 191,\n  \"b\" : 103\n  }",
+        "uiAlwaysShowDaisyChainPorts" : "true",
+        "uiHeaderColor" : "{\n  \"r\" : 188,\n  \"g\" : 129,\n  \"b\" : 83\n  }"
+        },
+      "title" : "PassIn",
+      "ports" : [
+        {
+          "objectType" : "Port",
+          "nodePortType" : "Out",
+          "name" : "value",
+          "execPortType" : "In",
+          "typeSpec" : "$TYPE$"
+          }
+        ],
+      "extDeps" : {},
+      "presetGUID" : "3C33E1B42A2643A035DBAB718554227D",
+      "code" : "dfgEntry {
+}
+"
+      },
+    "Fabric.Core.Data.Cache" : {
+      "objectType" : "Func",
+      "metadata" : {
+        "uiNodeColor" : "{\n  \"r\" : 214,\n  \"g\" : 191,\n  \"b\" : 103\n  }",
+        "uiAlwaysShowDaisyChainPorts" : "true",
+        "uiHeaderColor" : "{\n  \"r\" : 188,\n  \"g\" : 129,\n  \"b\" : 83\n  }"
+        },
+      "title" : "Cache",
+      "cacheRule" : "always",
+      "ports" : [
+        {
+          "objectType" : "Port",
+          "nodePortType" : "Out",
+          "name" : "value",
+          "execPortType" : "In",
+          "typeSpec" : "$TYPE$"
+          }
+        ],
+      "extDeps" : {},
+      "presetGUID" : "D903AFD981FE9214C69943F542D5FD60",
+      "code" : "dfgEntry {
+}
+"
+      },
+    "Fabric.Core.Control.If" : {
+      "objectType" : "Func",
+      "title" : "If",
+      "ports" : [
+        {
+          "objectType" : "Port",
+          "nodePortType" : "Out",
+          "name" : "cond",
+          "execPortType" : "In",
+          "typeSpec" : "Boolean"
+          },
+        {
+          "objectType" : "Port",
+          "nodePortType" : "Out",
+          "name" : "if_true",
+          "execPortType" : "In",
+          "typeSpec" : "$TYPE$"
+          },
+        {
+          "objectType" : "Port",
+          "nodePortType" : "Out",
+          "name" : "if_false",
+          "execPortType" : "In",
+          "typeSpec" : "$TYPE$"
+          },
+        {
+          "objectType" : "Port",
+          "nodePortType" : "In",
+          "name" : "result",
+          "execPortType" : "Out",
+          "typeSpec" : "$TYPE$"
+          }
+        ],
+      "extDeps" : {},
+      "presetGUID" : "3182A478A21643455D549E483D35F831",
+      "code" : "
+dfgEntry {
+	result = cond ? if_true : if_false;
+}
+"
+      },
+    "Fabric.Core.Logic.Le" : {
+      "objectType" : "Func",
+      "title" : "Le <=",
+      "ports" : [
+        {
+          "objectType" : "Port",
+          "nodePortType" : "Out",
+          "name" : "lhs",
+          "execPortType" : "In",
+          "typeSpec" : "$TYPE$"
+          },
+        {
+          "objectType" : "Port",
+          "nodePortType" : "Out",
+          "name" : "rhs",
+          "execPortType" : "In",
+          "typeSpec" : "$TYPE$"
+          },
+        {
+          "objectType" : "Port",
+          "nodePortType" : "In",
+          "name" : "result",
+          "execPortType" : "Out",
+          "typeSpec" : "Boolean"
+          }
+        ],
+      "extDeps" : {},
+      "presetGUID" : "29580C848A777A42608B45D8DF02D37C",
+      "code" : "
+dfgEntry {
+	result = lhs <= rhs;
+}
+"
+      },
+    "Colorbleed.RelaxMesh" : {
+      "objectType" : "Func",
+      "metadata" : {
+        "uiTextColor" : "{\n  \"r\" : 20,\n  \"g\" : 20,\n  \"b\" : 20\n  }",
+        "uiNodeColor" : "{\n  \"r\" : 121,\n  \"g\" : 134,\n  \"b\" : 143\n  }"
+        },
+      "title" : "RelaxMesh",
+      "ports" : [
+        {
+          "objectType" : "Port",
+          "nodePortType" : "IO",
+          "name" : "mesh",
+          "execPortType" : "IO",
+          "typeSpec" : "PolygonMesh"
+          },
+        {
+          "objectType" : "Port",
+          "nodePortType" : "Out",
+          "defaultValues" : {
+            "UInt32" : 1
+            },
+          "name" : "iterations",
+          "execPortType" : "In",
+          "typeSpec" : "Size"
+          }
+        ],
+      "extDeps" : {},
+      "presetGUID" : "A13E8D8AB42BC54EB5A81FC80A8F1759",
+      "code" : "operator SmoothPosTask<<<index>>>(in Vec3[] positions, in PolygonMesh mesh, io Vec3[] result)
+{
+  //Pseudo-gaussian: center weight = 0.5, neighbor weights sum = 0.5
+  Vec3 position = positions[ index ];
+
+  LocalL16UInt32Array surroundingPoints;
+  mesh.getPointSurroundingPoints( index, false, surroundingPoints );
+  UInt32 nbNei = surroundingPoints.size();
+  if( nbNei ) {
+    Vec3 neiSum = Vec3(0,0,0);
+    for( UInt32 i = 0; i < nbNei; ++i ) {
+      UInt32 neiPt = surroundingPoints.get(i);
+      neiSum += positions[neiPt];
+    }
+    neiSum /= Scalar(nbNei);
+    position = ( position + neiSum ) * 0.5;
+    result[index] = position;
+  }  
+
+}
+
+operator SmoothPosCopyArrayTask<<<i>>>(in Vec3[] src, io Vec3[] dest)
+{
+  dest[i] = src[i];
+}
+
+dfgEntry {
+
+  Vec3 positions[] = mesh.getAllPointPositions();
+  Size size = positions.size();
+  
+  Vec3 result[];
+  result.resize(size);
+  SmoothPosCopyArrayTask<<<size>>>(positions, result);
+  
+  for(Size i=0; i<iterations; i++)
+  {
+    SmoothPosTask<<<size>>>(positions, mesh, result);
+    SmoothPosCopyArrayTask<<<size>>>(result, positions);
+  }
+  
+  mesh.setAllPointPositions(positions);
+  
+}
+"
+      },
+    "Colorbleed.VertexSpaceFrames" : {
+      "objectType" : "Func",
+      "metadata" : {
+        "uiTextColor" : "{\n  \"r\" : 20,\n  \"g\" : 20,\n  \"b\" : 20\n  }",
+        "uiNodeColor" : "{\n  \"r\" : 121,\n  \"g\" : 134,\n  \"b\" : 143\n  }",
+        "uiTooltip" : "Build tangent space matrices for all vertices on the mesh. \n\n(Tangent and binormal are defined by the vertex order of the polygon and does not use UVs)"
+        },
+      "title" : "VertexSpaceFrames",
+      "ports" : [
+        {
+          "objectType" : "Port",
+          "nodePortType" : "Out",
+          "name" : "mesh",
+          "execPortType" : "In",
+          "typeSpec" : "PolygonMesh"
+          },
+        {
+          "objectType" : "Port",
+          "nodePortType" : "In",
+          "name" : "result",
+          "execPortType" : "Out",
+          "typeSpec" : "Mat44[]"
+          }
+        ],
+      "extDeps" : {},
+      "presetGUID" : "F1AD04046998C4C516B7DD277667D472",
+      "code" : "operator VertexBuildRefFrameTask<<<index>>>(in PolygonMesh mesh, in Vec3[] positions, io Mat44 result[]){
+
+  Mat44 m;
+  Vec3 p1 = positions[index];
+
+  LocalL16UInt32Array surroundingPoints;
+  mesh.getPointSurroundingPoints( index, false, surroundingPoints );
+  UInt32 nbNei = surroundingPoints.size();
+  if( nbNei == 0 ) 
+    return;
+  Vec3 p2 = positions[surroundingPoints.get(0)];
+  Vec3 p3 = positions[surroundingPoints.get(1)];
+
+  Vec3 dir = p2 - p1;
+  Vec3 nrm = dir.cross(p3 - p1);
+  Quat q;
+  q.setFromDirectionAndUpvector(dir, nrm);
+  m.set(p1, q.toMat33(), Vec3(1,1,1));
+  
+  result[index] = m;
+}
+
+
+dfgEntry {
+
+  Vec3 positions[] = mesh.getAllPointPositions();
+  result.resize(positions.size());
+  VertexBuildRefFrameTask<<<positions.size()>>>(mesh, positions, result);
+  
+}
+"
+      }
+    }
+  }

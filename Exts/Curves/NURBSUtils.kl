@@ -1,0 +1,462 @@
+// Based on NURBSCurve implementation of Github.com/mrdoob/three.js/examples/js/curves/
+
+require Math;
+require Geometry;
+
+/*
+	Finds knot array span.
+
+	degree : degree
+	u : parametric value
+	knots : knot array
+
+	returns the span
+*/
+/// \internal
+function Size NURBSUtils_findSpan( Size degree, Scalar u, Size knots[] )
+{
+	// Number of spans
+	Size n = knots.size() - degree - 1;
+
+	// Last span
+	if ( u >= knots[n] )
+		return n - 1;
+
+	// First span
+	if ( u <= knots[degree] )
+		return degree;
+
+	// Calculate span
+	Size low = degree;
+	Size high = n;
+	Size mid = floor( ( low + high ) / 2 );
+
+	while ( u < knots[mid] || u >= knots[mid + 1] ) {
+	  
+		if ( u < knots[mid] ) {
+			high = mid;
+		} else {
+			low = mid;
+		}
+
+		mid = floor( ( low + high ) / 2 );
+
+	}
+
+	return mid;
+}
+
+/*
+Calculate basis functions. See The NURBS Book, page 70, algorithm A2.2
+
+span : span in which u lies
+u    : parametric point
+degree    : degree
+knots    : knot array
+
+returns array[degree+1] with basis functions values.
+*/
+/// \internal
+function Scalar[] NURBSUtils_calcBasisFunctions( Size span, Scalar u, Size degree, Size knots[]) {
+
+	Scalar result[];
+	result.resize(degree + 1);
+	Scalar left[];
+	left.resize(degree + 1);
+	Scalar right[];
+	right.resize(degree + 1);
+
+	result[0] = 1.0;
+
+	for ( Size j = 1; j <= degree; ++ j ) {
+
+		left[j] = u - knots[span + 1 - j];
+		right[j] = knots[span + j] - u;
+
+		Scalar saved = 0.0;
+
+		for ( Size r = 0; r < j; ++ r ) {
+
+			Scalar rv = right[r + 1];
+			Scalar lv = left[j - r];
+
+			Scalar temp = result[r] / ( rv + lv );
+			result[r] = saved + rv * temp;
+			saved = lv * temp;
+
+		 }
+
+		 result[j] = saved;
+
+	 }
+
+	 return result;
+
+}
+
+/*
+Calculate B-Spline curve points. See The NURBS Book, page 82, algorithm A3.1.
+
+degree : degree of B-Spline
+knots : knot array
+controlPoints : control points (x, y, z, w)
+u : parametric point
+
+returns point for given u
+*/
+/// \internal
+function Vec4 NURBSUtils_calcBSplinePoint(Size degree, Size knots[], Vec4 controlPoints[], Scalar u) {
+
+		Size span = NURBSUtils_findSpan(degree, u, knots);
+		Scalar basises[] = NURBSUtils_calcBasisFunctions(span, u, degree, knots);
+		Vec4 result(0, 0, 0, 0);
+
+		for ( Size j = 0; j <= degree; ++ j ) {
+
+			Vec4 point = controlPoints[span - degree + j];
+			Scalar basis = basises[j];
+			Scalar weight = point.t * basis;
+			result.x += point.x * weight;
+			result.y += point.y * weight;
+			result.z += point.z * weight;
+			result.t += point.t * basis;
+
+		}
+
+		return result;
+
+}
+
+/*
+	Calculate basis functions derivatives. See The NURBS Book, page 72, algorithm A2.3.
+
+	span : span in which u lies
+	u    : parametric point
+	degree    : degree
+	n    : number of derivatives to calculate
+	knots    : knot array
+
+	returns array[n+1][degree+1] with basis functions derivatives
+*/
+/// \internal
+function Scalar[][] NURBSUtils_calcBasisFunctionDerivatives( Size span, Scalar u, Size degree, Scalar n, Size knots[] ) {
+
+		Scalar zeroArr[];
+		zeroArr.resize(degree);
+		for ( Size i = 0; i <= degree; ++ i )
+			zeroArr[i] = 0.0;
+		
+		Scalar ders[][];
+		ders.resize(n);
+		for ( Size i = 0; i <= n; ++ i )
+			ders[i] = zeroArr.clone();
+
+		Scalar ndu[][];
+		ndu.resize(degree);
+		for ( Size i = 0; i <= degree; ++ i )
+			ndu[i] = zeroArr.clone();
+
+		ndu[0][0] = 1.0;
+		Scalar left[] = zeroArr.clone();
+		Scalar right[] = zeroArr.clone();
+
+		for(Size j=1; j <= degree; ++j)
+		{
+
+			left[j] = u - knots[span + 1 - j];
+			right[j] = knots[span + j] - u;
+
+			Scalar saved = 0.0;
+
+			for ( Size r = 0; r < j; ++ r ) {
+
+				Scalar rv = right[r + 1];
+				Scalar lv = left[j - r];
+				ndu[j][r] = rv + lv;
+
+				Scalar temp = ndu[r][j - 1] / ndu[j][r];
+				ndu[r][j] = saved + rv * temp;
+				saved = lv * temp;
+
+			}
+
+			ndu[j][j] = saved;
+
+		}
+
+		for (Size j = 0; j <= degree; ++j) {
+			ders[0][j] = ndu[j][degree];
+		}
+
+		for (Size r = 0; r <= degree; ++r) {
+
+			Size s1 = 0;
+			Size s2 = 1;
+
+			Scalar a[][];
+			a.resize(degree);
+			for (Size i = 0; i <= degree; ++i) {
+				a[i] = zeroArr.clone();
+			}
+
+			a[0][0] = 1.0;
+
+			for ( Size k = 1; k <= n; ++ k ) {
+
+				Scalar d = 0.0;
+				Size rk = r - k;
+				Size pk = degree - k;
+
+				if ( r >= k ) {
+
+					a[s2][0] = a[s1][0] / ndu[pk + 1][rk];
+					d = a[s2][0] * ndu[rk][pk];
+
+				}
+
+				Size j1 = ( rk >= - 1 ) ? 1 : - rk;
+				Size j2 = ( r - 1 <= pk ) ? k - 1 :  degree - r;
+
+				for ( Size j = j1; j <= j2; ++ j ) {
+
+					a[s2][j] = ( a[s1][j] - a[s1][j - 1] ) / ndu[pk + 1][rk + j];
+					d += a[s2][j] * ndu[rk + j][pk];
+
+				}
+
+				if ( r <= pk ) {
+
+					a[s2][k] = - a[s1][k - 1] / ndu[pk + 1][r];
+					d += a[s2][k] * ndu[r][pk];
+
+				}
+
+				ders[k][r] = d;
+
+				Size j = s1;
+				s1 = s2;
+				s2 = j;
+
+			}
+
+		}
+
+		Size r = degree;
+
+		for (Size k = 1; k <= n; ++ k) {
+
+			for (Size j = 0; j <= degree; ++ j) {
+
+				ders[k][j] *= r;
+
+			}
+			r *= degree - k;
+
+		}
+
+		return ders;
+
+}
+
+
+/*
+	Calculate derivatives of a B-Spline. See The NURBS Book, page 93, algorithm A3.2.
+
+	degree  : degree
+	knots  : knot vector
+	controlPoints  : control points
+	u  : Parametric points
+	nd : number of derivatives
+
+	returns array[d+1] with derivatives
+*/
+/// \internal
+function Vec4[] NURBSUtils_calcBSplineDerivatives( Size degree, Size knots[], Vec4 controlPoints[], Scalar u, Size nd ) {
+
+	Size du = nd < degree ? nd : degree;
+	Size span = NURBSUtils_findSpan( degree, u, knots );
+	Scalar nders[][] = NURBSUtils_calcBasisFunctionDerivatives( span, u, degree, du, knots );
+	
+	Vec4 pw[];
+	pw.resize(controlPoints.size());
+
+	Vec4 ck[];
+	ck.resize(du);
+
+	for (Size i = 0; i < controlPoints.size(); ++ i) {
+
+		Vec4 point = controlPoints[i].clone();
+		Scalar t = point.t;
+
+		point.x *= t;
+		point.y *= t;
+		point.z *= t;
+
+		pw[i] = point;
+	}
+
+	for (Size k = 0; k <= du; ++ k) {
+
+		Vec4 point = pw[span - degree].clone() * nders[k][0];
+
+		for (Size j = 1; j <= degree; ++ j) {
+			point += pw[span - degree + j].clone() * nders[k][j];
+		}
+
+		ck[k] = point;
+
+	}
+
+	for ( Size k = du + 1; k <= nd + 1; ++ k ) {
+
+		ck[k] = Vec4( 0, 0, 0, 1 );
+
+	}
+
+	return ck;
+
+}
+
+
+/*
+Calculate "K over I"
+
+returns k!/(i!(k-i)!)
+*/
+/// \internal
+function Size NURBSUtils_calcKoverI( Size k, Size i ) {
+
+	Size nom = 1;
+
+	for ( Size j = 2; j <= k; ++ j ) {
+		nom *= j;
+	}
+
+	Size denom = 1;
+
+	for ( Size j = 2; j <= i; ++ j ) {
+		denom *= j;
+	}
+
+	for ( Size j = 2; j <= k - i; ++ j ) {
+		denom *= j;
+	}
+
+	return nom / denom;
+
+}
+
+
+/*
+Calculate derivatives (0-nd) of rational curve. See The NURBS Book, page 127, algorithm A4.2.
+
+Pders : result of function calcBSplineDerivatives
+
+returns array with derivatives for rational curve.
+*/
+/// \internal
+function Vec4[] NURBSUtils_calcRationalCurveDerivatives( Vec4 pders[] ) {
+
+	Size nd = pders.size();
+	Vec3 aders[]; // a derivatives
+	Scalar wders[]; // weighted derivatives
+
+	aders.resize(nd);
+	wders.resize(nd);
+
+	for ( Size i = 0; i < nd; ++ i ) {
+
+		Vec4 point = pders[i];
+		aders[i] = Vec3( point.x, point.y, point.z );
+		wders[i] = point.t;
+
+	}
+
+	Vec4 ck[];
+	ck.resize(nd);
+
+	for ( Size k = 0; k < nd; ++ k ) {
+
+		Vec3 v_tmp = aders[k].clone();
+		Vec4 v = Vec4(v_tmp.x, v_tmp.y, v_tmp.z, 1.0);
+		for ( Size i = 1; i <= k; ++ i ) {
+			v -= ck[k - i].clone() * (NURBSUtils_calcKoverI(k, i) * wders[i]);
+		}
+
+		ck[k] = v / wders[0];
+
+	}
+
+	return ck;
+
+}
+
+
+/*
+Calculate NURBS curve derivatives. See The NURBS Book, page 127, algorithm A4.2.
+
+degree  : degree
+knots  : knot vector
+controlPoints  : control points in homogeneous space
+u  : parametric points
+nd : number of derivatives
+
+returns array with derivatives.
+*/
+/// \internal
+function Vec4[] NURBSUtils_calcNURBSDerivatives( Size degree, Size knots[], Vec4 controlPoints[], Scalar u, Size nd ) {
+
+	Vec4 Pders[] = NURBSUtils_calcBSplineDerivatives(degree, knots, controlPoints, u, nd);
+	return NURBSUtils_calcRationalCurveDerivatives(Pders);
+
+}
+
+
+/*
+Calculate rational B-Spline surface point. See The NURBS Book, page 134, algorithm A4.3.
+
+degree, degree2 : degrees of B-Spline surface
+knots, knots2 : Knots arrays
+controlPoints : control points (x, y, z, t)
+u, v   : parametric values
+
+returns point for given (u, v)
+*/
+/// \internal
+function Vec3 NURBSUtils_calcSurfacePoint( Size degree, Size degree2, Size knots[], Size knots2[], Vec4 controlPoints[][], Scalar u, Scalar v ) {
+
+	Size uspan = NURBSUtils_findSpan( degree, u, knots );
+	Size vspan = NURBSUtils_findSpan( degree2, v, knots2 );
+	Scalar Nu[] = NURBSUtils_calcBasisFunctions( uspan, u, degree, knots );
+	Scalar Nv[] = NURBSUtils_calcBasisFunctions( vspan, v, degree2, knots2 );
+
+	Vec4 temp[];
+	temp.resize(degree2);
+
+	for ( Size l = 0; l <= degree2; ++ l ) {
+
+		temp[l] = Vec4( 0, 0, 0, 0 );
+		for ( Size k = 0; k <= degree; ++ k ) {
+
+			Vec4 point = controlPoints[uspan - degree + k][vspan - degree2 + l].clone();
+			Scalar t = point.t;
+			point.x *= t;
+			point.y *= t;
+			point.z *= t;
+			temp[l].add( point.multiplyScalar( Nu[k] ) );
+
+		}
+
+	}
+
+	Vec4 Sw( 0, 0, 0, 0 );
+	for ( Size l = 0; l <= degree2; ++ l ) {
+
+		Sw.add( temp[l] * Nv[l] );
+
+	}
+
+	Sw /= Sw.t;
+	return Vec3( Sw.x, Sw.y, Sw.z );
+
+}
