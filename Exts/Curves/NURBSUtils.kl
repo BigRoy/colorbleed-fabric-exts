@@ -423,40 +423,46 @@ u, v   : parametric values
 returns point for given (u, v)
 */
 /// \internal
-function Vec3 NURBSUtils_calcSurfacePoint( Size degree, Size degree2, Size knots[], Size knots2[], Vec4 controlPoints[][], Scalar u, Scalar v ) {
+function Vec3 NURBSUtils_calcSurfacePoint( Size degreeU, Size degreeV, Size knotsU[], Size knotsV[], Vec4 controlPoints[][], Scalar u, Scalar v ) {
 
-	Size uspan = NURBSUtils_findSpan( degree, u, knots );
-	Size vspan = NURBSUtils_findSpan( degree2, v, knots2 );
-	Scalar Nu[] = NURBSUtils_calcBasisFunctions( uspan, u, degree, knots );
-	Scalar Nv[] = NURBSUtils_calcBasisFunctions( vspan, v, degree2, knots2 );
+	// Get the span the U and V is in
+	Size uspan = NURBSUtils_findSpan( degreeU, u, knotsU );
+	Size vspan = NURBSUtils_findSpan( degreeV, v, knotsV );
 
+	// Compute the basis functions (strengths) for all controlPoints at UV
+	Scalar Nu[] = NURBSUtils_calcBasisFunctions( uspan, u, degreeU, knotsU );
+	Scalar Nv[] = NURBSUtils_calcBasisFunctions( vspan, v, degreeV, knotsV );
+
+	// Compute the final point
 	Vec4 temp[];
-	temp.resize(degree2);
+	temp.resize(degreeV + 1);
 
-	for ( Size l = 0; l <= degree2; ++ l ) {
+	for (Size l = 0; l <= degreeV; ++l) {
 
-		temp[l] = Vec4( 0, 0, 0, 0 );
-		for ( Size k = 0; k <= degree; ++ k ) {
+		// TODO: This should be Vec4(0, 0, 0, 0) but causes division by zero
+		// see: https://goo.gl/cQOFc1=
+		temp[l] = Vec4( 0, 0, 0, 1.0 );
+		for (Size k = 0; k <= degreeU; ++k) {
 
-			Vec4 point = controlPoints[uspan - degree + k][vspan - degree2 + l].clone();
+			Vec4 point = controlPoints[uspan - degreeU + k][vspan - degreeV + l].clone();
 			Scalar t = point.t;
 			point.x *= t;
 			point.y *= t;
 			point.z *= t;
-			temp[l].add( point.multiplyScalar( Nu[k] ) );
+
+			temp[l] += point * Nu[k];
 
 		}
 
 	}
-
-	Vec4 Sw( 0, 0, 0, 0 );
-	for ( Size l = 0; l <= degree2; ++ l ) {
-
-		Sw.add( temp[l] * Nv[l] );
-
+	
+	// TODO: This should be Vec4(0, 0, 0, 0) but causes division by zero
+	// see: https://goo.gl/cQOFc1=
+	Vec4 Sw( 0, 0, 0, 1.0 );
+	for (Size l = 0; l <= degreeV; ++ l) {
+		Sw += temp[l] * Nv[l];
 	}
 
-	Sw /= Sw.t;
-	return Vec3( Sw.x, Sw.y, Sw.z );
+	return Sw.makeHomogeneousVec3();
 
 }

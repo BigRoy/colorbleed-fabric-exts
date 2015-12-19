@@ -1,6 +1,7 @@
 {
   "code": [
     "NURBSCurve.kl",
-    "NURBSUtils.kl"
+    "NURBSUtils.kl",
+    "NURBSSurface.kl",
     ]
 }

@@ -1,8 +1,13 @@
+// NURBSCurve core implementation.
+// 
+// For math background search:
+// - Non-uniform rational B-spline curve
+// - Cox de Boor algorithm
 
 require Math;
 require Geometry;
 
-
+/// An implementation of a Non-uniform rational B-spline curve.
 object NURBSCurve {
   private Vec4 controlPoints[];
   private Size degree;
@@ -63,10 +68,8 @@ function Vec3 NURBSCurve.getPoint(Scalar param)
 	// following results in (wx, wy, wz, w) homogeneous point
 	Vec4 hpoint = NURBSUtils_calcBSplinePoint( this.degree, this.knots, this.controlPoints, u );
 
-	// TODO: Think this could be replaced with `hpoint.makeHomogeneousVec3()`
-	if ( hpoint.t != 1.0 )
-		hpoint /= hpoint.t; // project to 3D space: (wx, wy, wz, w) -> (x, y, z, 1)
-	return hpoint.xyz();
+	// project to 3D space: (wx, wy, wz, w) -> (x, y, z, 1)
+	return hpoint.makeHomogeneousVec3();
 
 }
 

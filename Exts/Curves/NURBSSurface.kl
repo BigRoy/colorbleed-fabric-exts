@@ -1,0 +1,206 @@
+// References: 
+// https://github.com/pboyer/verb
+// https://github.com/sntx/NURBSForTHREE
+
+struct NURBSSurface {
+
+	Size degreeU;
+	Size degreeV;
+	Size knotsU[];
+	Size knotsV[];
+	Vec4 controlPoints[][];
+
+};
+
+/// Default constructor
+function NURBSSurface(Vec4 cps[][], Size degreeU, Size degreeV)
+{
+	this.controlPoints = cps;
+	this.degreeU = degreeU;
+	this.degreeV = degreeV;
+
+	// All arrays along a direction (U or V) must be same size!
+	this.computeUniformKnots();
+}
+
+/// Compute uniform knots based on the current points and degree
+function NURBSSurface.computeUniformKnots!()
+{	
+	if (this.controlPoints.size() == 0)
+	{
+		this.knotsU.resize(0);
+		this.knotsV.resize(0);
+		return;
+	}
+
+	// U
+	Integer counter = 0;
+	Integer knotsSize = this.degreeU + this.controlPoints.size() + 1;
+	this.knotsU.resize(knotsSize);
+
+	for(Integer i=0; i<knotsSize; i++)
+	{
+
+		// Degree + 1 at start of 0 knots to clamp the curve
+		if (i <= this.degreeU)
+			this.knotsU[i] = 0;
+
+		// Degree + 1 at the end of the highest knots value to clamp the curve
+		else if (i > knotsSize - this.degreeU - 1)
+			this.knotsU[i] = counter;
+
+		// Otherise increase knot gradually
+		else
+			this.knotsU[i] = ++counter;
+	}
+
+	// V	
+	counter = 0;
+	knotsSize = this.degreeV + this.controlPoints[0].size() + 1;
+	this.knotsV.resize(knotsSize);
+
+	for(Integer i=0; i<knotsSize; i++)
+	{
+
+		// Degree + 1 at start of 0 knots to clamp the curve
+		if (i <= this.degreeV)
+			this.knotsV[i] = 0;
+
+		// Degree + 1 at the end of the highest knots value to clamp the curve
+		else if (i > knotsSize - this.degreeV - 1)
+			this.knotsV[i] = counter;
+
+		// Otherise increase knot gradually
+		else
+			this.knotsV[i] = ++counter;
+	}
+}
+
+/// Return the number of spans in U and V direction
+function Vec2 NURBSSurface.numSpans()
+{
+	return Vec2(this.knotsU.size(), this.knotsV.size());
+}
+
+/// Get the U and V value at the given parameter 0-1
+/// Converts to linearly distributed value between minimum knot and maximum knot in U and V 
+function Vec2 NURBSSurface.getUVAtParam(Scalar paramU, Scalar paramV)
+{
+	Scalar u = this.knotsU[0] + paramU * (this.knotsU[this.knotsU.size() - 1] - this.knotsU[0]); // linear mapping paramU->u
+	Scalar v = this.knotsV[0] + paramV * (this.knotsV[this.knotsV.size() - 1] - this.knotsV[0]); // linear mapping paramV->u
+	return Vec2(u, v);
+}
+
+/// Get the point position at U and V param between 0-1
+function Vec3 NURBSSurface.getPointAtParam(Scalar paramU, Scalar paramV)
+{
+	Vec2 uv = this.getUVAtParam(paramU, paramV);
+	return this.getPointAtUV(uv.x, uv.y);
+}
+
+// Get the point position at UV
+function Vec3 NURBSSurface.getPointAtUV(Scalar u, Scalar v)
+{
+	return NURBSUtils_calcSurfacePoint(this.degreeU, this.degreeV, this.knotsU, this.knotsV, this.controlPoints, u, v);
+}
+
+/// Get the normal at UV using the cross product of binormal and tangent
+/// To be really optimal in your code when you also need the binormal
+/// and tangent then use `this.getVectorsAtUV`.
+function Vec3 NURBSSurface.getNormalAtUV(Scalar u, Scalar v)
+{
+	throw("NotImplemented");
+	return Vec3();
+}
+
+/// Get the binormal at UV using derivative of U direction.
+function Vec3 NURBSSurface.getBinormalAtUV(Scalar u, Scalar v)
+{
+	throw("NotImplemented");
+	return Vec3();
+}
+
+/// Get the binormal at UV using derivative of V direction.
+function Vec3 NURBSSurface.getTangentAtUV(Scalar u, Scalar v)
+{
+	throw("NotImplemented");
+	return Vec3();
+}
+
+/// Get the normal, tangent and binormal at the UV point
+function Vec3 NURBSSurface.getVectorsAtUV(Scalar u, Scalar v, out Vec3 normal, out Vec3 tangent, out Vec3 binormal)
+{
+	throw("NotImplemented");
+	return Vec3();
+}
+
+/// Get the transformation frame at the UV point using normal, binormal and tangent.
+function Xfo NURBSSurface.getFrameAtUV(Scalar u, Scalar v)
+{
+	Vec3 normal;
+	Vec3 tangent;
+	Vec3 binormal;
+	this.getVectorsAtUV(u, v, normal, tangent, binormal);
+	Vec3 pos = this.getPointAtUV(u, v);
+ 	
+ 	// Note: Fabric Engine is Column-Major
+	Mat44 mat(normal.x, tangent.x, binormal.x, pos.x,
+			  normal.y, tangent.y, binormal.y, pos.y,
+			  normal.z, tangent.z, binormal.z, pos.z,
+			  0, 0, 0, 1);
+
+	return Xfo(mat); 
+}
+
+/// Creates a PolygonMesh without UVs with (detailU * numSpansU) * (detailV * numSpansV) vertices
+function PolygonMesh NURBSSurface.toPolygonMesh(Size detailU, Size detailV)
+{
+	// Detail is multiplied by number of spans so the
+	// draw quality stays the same if the mesh is larger
+	Vec2 numSpans = this.numSpans();
+
+	// Min-max U and V
+	Scalar minU = this.knotsU[0];
+	Scalar maxU = this.knotsU[this.knotsU.size() - 1];
+	Scalar minV = this.knotsV[0];
+	Scalar maxV = this.knotsV[this.knotsV.size() - 1];
+
+	// Compute step sizes
+	Size numU = detailU * numSpans.x;
+	Size numV = detailV * numSpans.y;
+	Scalar uStep = (maxU - minU) / Scalar(numU - 1.0);
+	Scalar vStep = (maxV - minV) / Scalar(numV - 1.0);
+
+	// TODO: Optimize this!
+	// Create a plane
+	PolygonMesh mesh();
+	mesh.beginStructureChanges();
+	mesh.addPlane(Xfo(), 1.0, 1.0, numU-1, numV-1);
+	Integer counter = 0;
+
+	// Sample the "mesh" positions
+	// Set position of the plane's points
+	for(Size i=0; i<numU; i++)
+	{
+		Scalar u = minU + (i * uStep);
+		for(Size j=0; j<numV; j++)
+		{	
+			Scalar v = minV + (j * vStep);
+			Vec3 pt = this.getPointAtUV(u, v);
+			mesh.setPointPosition(counter, pt);
+			counter++;
+		}
+	}
+
+	mesh.endStructureChanges();
+	mesh.recomputePointNormals();
+	return mesh;
+}
+
+/// \internal
+function NURBSSurface.draw(Size detail)
+{
+	throw("NotImplemented");
+	PolygonMesh mesh = this.toPolygonMesh(detail, detail);
+	// TODO draw mesh
+}
