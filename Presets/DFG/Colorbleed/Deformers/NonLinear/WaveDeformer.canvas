@@ -1,0 +1,266 @@
+{
+  "objectType" : "Func",
+  "metadata" : {
+    "uiTextColor" : "{\n  \"r\" : 20,\n  \"g\" : 20,\n  \"b\" : 20\n  }",
+    "uiNodeColor" : "{\n  \"r\" : 121,\n  \"g\" : 134,\n  \"b\" : 143\n  }"
+    },
+  "title" : "WaveDeformer",
+  "ports" : [
+    {
+      "objectType" : "Port",
+      "nodePortType" : "IO",
+      "name" : "this",
+      "execPortType" : "IO",
+      "typeSpec" : "PolygonMesh"
+      },
+    {
+      "objectType" : "Port",
+      "nodePortType" : "Out",
+      "defaultValues" : {
+        "Float32" : 1
+        },
+      "name" : "amplitude",
+      "execPortType" : "In",
+      "typeSpec" : "Scalar"
+      },
+    {
+      "objectType" : "Port",
+      "nodePortType" : "Out",
+      "defaultValues" : {
+        "Float32" : 1
+        },
+      "name" : "wavelength",
+      "execPortType" : "In",
+      "typeSpec" : "Scalar"
+      },
+    {
+      "objectType" : "Port",
+      "nodePortType" : "Out",
+      "defaultValues" : {
+        "Scalar" : 0
+        },
+      "name" : "offset",
+      "execPortType" : "In",
+      "typeSpec" : "Scalar"
+      },
+    {
+      "objectType" : "Port",
+      "nodePortType" : "Out",
+      "defaultValues" : {
+        "Boolean" : true
+        },
+      "name" : "minRadius",
+      "execPortType" : "In",
+      "typeSpec" : "Scalar"
+      },
+    {
+      "objectType" : "Port",
+      "nodePortType" : "Out",
+      "defaultValues" : {
+        "Float32" : 1
+        },
+      "name" : "maxRadius",
+      "execPortType" : "In",
+      "typeSpec" : "Scalar"
+      },
+    {
+      "objectType" : "Port",
+      "nodePortType" : "Out",
+      "defaultValues" : {
+        "Float32" : 0
+        },
+      "name" : "dropoff",
+      "execPortType" : "In",
+      "typeSpec" : "Scalar"
+      },
+    {
+      "objectType" : "Port",
+      "nodePortType" : "Out",
+      "name" : "deformSpace",
+      "execPortType" : "In",
+      "typeSpec" : "Mat44"
+      }
+    ],
+  "extDeps" : {},
+  "presetGUID" : "3D775CD66B202D1D22EF1764375A51F3",
+  "code" : "operator WaveDeformTask<<<index>>>(io Vec3 pts[], Scalar amplitude, Scalar wavelength, Scalar offset, Scalar minRadius, Scalar maxRadius, Scalar dropoff, Mat44 deformSpace, Mat44 deformSpaceInv)
+{
+  Vec3 pt = pts[index];
+  
+  // Distance from the center in x and z of the wave is the sample point
+  // on the wave algorithm
+  Scalar radius = sqrt((pt.x * pt.x) + (pt.z * pt.z));
+  
+  // Use the min-max range
+  if (radius < minRadius || radius > maxRadius)
+      return;
+  
+  // Calculate amplitude of point (w/ dropoff)
+  Scalar radiusRangePercentage = (radius - minRadius) / (maxRadius - minRadius);
+  Scalar pointAmplitude = amplitude;
+  
+  Scalar currentDropoff = 1.0;
+  if (dropoff > 0.0)
+    currentDropoff = 1 - (dropoff * radiusRangePercentage);
+  else if (dropoff < 0.0)
+    currentDropoff = 1 - (dropoff * (1 - radiusRangePercentage));
+  
+  if (currentDropoff != 1.0)
+      pointAmplitude *= currentDropoff;
+  
+  Scalar wavePoint = radius + offset;
+  Scalar frequency = 1.0 / wavelength;
+  
+  // y = y + a * (sin(u*sqrt(x^2+y^2)+t))
+  Scalar push = sin(wavePoint * frequency) * pointAmplitude;
+        
+  pts[index] = Vec3(pt.x, pt.y + push, pt.z);
+}
+
+
+dfgEntry {
+
+  if (amplitude == 0.0) return;
+  if (minRadius >= maxRadius) return;
+
+  Mat44 deformSpaceInv = deformSpace.inverse(); 
+  Vec3 pts[] = this.getAllPointPositions();
+  WaveDeformTask<<<pts.size()>>>(pts, amplitude, wavelength, offset, minRadius, maxRadius, dropoff, deformSpace, deformSpaceInv);
+  this.setAllPointPositions(pts);
+}
+",
+  "requiredPresets" : {
+    "Colorbleed.Deformers.NonLinear.WaveDeformer" : {
+      "objectType" : "Func",
+      "metadata" : {
+        "uiTextColor" : "{\n  \"r\" : 20,\n  \"g\" : 20,\n  \"b\" : 20\n  }",
+        "uiNodeColor" : "{\n  \"r\" : 121,\n  \"g\" : 134,\n  \"b\" : 143\n  }"
+        },
+      "title" : "WaveDeformer",
+      "ports" : [
+        {
+          "objectType" : "Port",
+          "nodePortType" : "IO",
+          "name" : "this",
+          "execPortType" : "IO",
+          "typeSpec" : "PolygonMesh"
+          },
+        {
+          "objectType" : "Port",
+          "nodePortType" : "Out",
+          "defaultValues" : {
+            "Float32" : 1
+            },
+          "name" : "amplitude",
+          "execPortType" : "In",
+          "typeSpec" : "Scalar"
+          },
+        {
+          "objectType" : "Port",
+          "nodePortType" : "Out",
+          "defaultValues" : {
+            "Float32" : 1
+            },
+          "name" : "wavelength",
+          "execPortType" : "In",
+          "typeSpec" : "Scalar"
+          },
+        {
+          "objectType" : "Port",
+          "nodePortType" : "Out",
+          "defaultValues" : {
+            "Scalar" : 0
+            },
+          "name" : "offset",
+          "execPortType" : "In",
+          "typeSpec" : "Scalar"
+          },
+        {
+          "objectType" : "Port",
+          "nodePortType" : "Out",
+          "defaultValues" : {
+            "Boolean" : true
+            },
+          "name" : "minRadius",
+          "execPortType" : "In",
+          "typeSpec" : "Scalar"
+          },
+        {
+          "objectType" : "Port",
+          "nodePortType" : "Out",
+          "defaultValues" : {
+            "Float32" : 1
+            },
+          "name" : "maxRadius",
+          "execPortType" : "In",
+          "typeSpec" : "Scalar"
+          },
+        {
+          "objectType" : "Port",
+          "nodePortType" : "Out",
+          "defaultValues" : {
+            "Float32" : 0
+            },
+          "name" : "dropoff",
+          "execPortType" : "In",
+          "typeSpec" : "Scalar"
+          },
+        {
+          "objectType" : "Port",
+          "nodePortType" : "Out",
+          "name" : "deformSpace",
+          "execPortType" : "In",
+          "typeSpec" : "Mat44"
+          }
+        ],
+      "extDeps" : {},
+      "presetGUID" : "3D775CD66B202D1D22EF1764375A51F3",
+      "code" : "operator WaveDeformTask<<<index>>>(io Vec3 pts[], Scalar amplitude, Scalar wavelength, Scalar offset, Scalar minRadius, Scalar maxRadius, Scalar dropoff, Mat44 deformSpace, Mat44 deformSpaceInv)
+{
+  Vec3 pt = pts[index];
+  
+  // Distance from the center in x and z of the wave is the sample point
+  // on the wave algorithm
+  Scalar radius = sqrt((pt.x * pt.x) + (pt.z * pt.z));
+  
+  // Use the min-max range
+  if (radius < minRadius || radius > maxRadius)
+      return;
+  
+  // Calculate amplitude of point (w/ dropoff)
+  Scalar radiusRangePercentage = (radius - minRadius) / (maxRadius - minRadius);
+  Scalar pointAmplitude = amplitude;
+  
+  Scalar currentDropoff = 1.0;
+  if (dropoff > 0.0)
+    currentDropoff = 1 - (dropoff * radiusRangePercentage);
+  else if (dropoff < 0.0)
+    currentDropoff = 1 - (dropoff * (1 - radiusRangePercentage));
+  
+  if (currentDropoff != 1.0)
+      pointAmplitude *= currentDropoff;
+  
+  Scalar wavePoint = radius + offset;
+  Scalar frequency = 1.0 / wavelength;
+  
+  // y = y + a * (sin(u*sqrt(x^2+y^2)+t))
+  Scalar push = sin(wavePoint * frequency) * pointAmplitude;
+        
+  pts[index] = Vec3(pt.x, pt.y + push, pt.z);
+}
+
+
+dfgEntry {
+
+  if (amplitude == 0.0) return;
+  if (minRadius >= maxRadius) return;
+
+  Mat44 deformSpaceInv = deformSpace.inverse(); 
+  Vec3 pts[] = this.getAllPointPositions();
+  WaveDeformTask<<<pts.size()>>>(pts, amplitude, wavelength, offset, minRadius, maxRadius, dropoff, deformSpace, deformSpaceInv);
+  this.setAllPointPositions(pts);
+}
+"
+      }
+    }
+  }
