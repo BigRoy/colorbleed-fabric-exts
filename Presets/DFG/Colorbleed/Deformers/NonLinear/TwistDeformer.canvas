@@ -1,0 +1,276 @@
+{
+  "objectType" : "Func",
+  "metadata" : {
+    "uiTextColor" : "{\n  \"r\" : 20,\n  \"g\" : 20,\n  \"b\" : 20\n  }",
+    "uiNodeColor" : "{\n  \"r\" : 121,\n  \"g\" : 134,\n  \"b\" : 143\n  }"
+    },
+  "title" : "TwistDeformer",
+  "ports" : [
+    {
+      "objectType" : "Port",
+      "nodePortType" : "IO",
+      "name" : "this",
+      "execPortType" : "IO",
+      "typeSpec" : "PolygonMesh"
+      },
+    {
+      "objectType" : "Port",
+      "nodePortType" : "Out",
+      "defaultValues" : {
+        "Float32" : -90
+        },
+      "name" : "startAngle",
+      "execPortType" : "In",
+      "typeSpec" : "Scalar"
+      },
+    {
+      "objectType" : "Port",
+      "nodePortType" : "Out",
+      "defaultValues" : {
+        "Float32" : 90
+        },
+      "name" : "endAngle",
+      "execPortType" : "In",
+      "typeSpec" : "Scalar"
+      },
+    {
+      "objectType" : "Port",
+      "nodePortType" : "Out",
+      "defaultValues" : {
+        "Float32" : -1
+        },
+      "name" : "lowBound",
+      "execPortType" : "In",
+      "typeSpec" : "Scalar"
+      },
+    {
+      "objectType" : "Port",
+      "nodePortType" : "Out",
+      "defaultValues" : {
+        "Boolean" : true,
+        "Float32" : 1
+        },
+      "name" : "highBound",
+      "execPortType" : "In",
+      "typeSpec" : "Scalar"
+      },
+    {
+      "objectType" : "Port",
+      "nodePortType" : "Out",
+      "name" : "deformSpace",
+      "execPortType" : "In",
+      "typeSpec" : "Mat44"
+      },
+    {
+      "objectType" : "Port",
+      "nodePortType" : "Out",
+      "defaultValues" : {
+        "Boolean" : true
+        },
+      "name" : "asDegrees",
+      "execPortType" : "In",
+      "typeSpec" : "Boolean"
+      }
+    ],
+  "extDeps" : {},
+  "presetGUID" : "622A03E34A53D2380E17FC392ABCFFD1",
+  "code" : "operator TwistTask<<<index>>>(io Vec3 pts[], Scalar startAngle, Scalar endAngle, Scalar lowBound, Scalar highBound, Mat44 deformSpace, Mat44 deformSpaceInv)
+{
+  Vec3 pt = pts[index];
+  Vec3 newPt = pt.clone();
+    
+  // Convert to deformer local space
+  pt = deformSpaceInv * pt;
+
+  // If at exact zero then it won't bend at all. (Odds that this
+  // happens are small!)
+  Scalar height = pt.y;
+  if (height == 0) return;
+  
+  // Limit between start and end bound
+  height = Math_clamp(height, lowBound, highBound);
+  
+  // Percentage between the bounds
+  Scalar percentage = (pt.y - lowBound) / (highBound - lowBound);
+  Scalar angle = (percentage * (endAngle - startAngle)) + startAngle;
+  
+  // Maya does it the exact opposite way, so we reverse our angle
+  angle *= -1;
+  
+  // Reference:
+  // Say you want to rotate a vector or a point in 2D by `b`
+  // x' = x cos b - y sin b
+  // y' = x sin b + y cos b
+  
+  // Rotate the point around local y-axis by angle in 2D
+  newPt.x = pt.x * cos(angle) + pt.z * sin(angle);
+  newPt.z = pt.x * sin(angle) + pt.z * cos(angle);
+  
+  // Convert back to original space
+  newPt = deformSpace * newPt;
+  
+  pts[index] = newPt;
+}
+
+
+dfgEntry {
+
+  if (startAngle == 0.0 && endAngle == 0.0) return;
+  if (lowBound >= highBound) return;
+  
+  Scalar start = startAngle;
+  Scalar end = endAngle;
+  if (asDegrees)
+  { 
+    start *= DEG_TO_RAD;
+    end *= DEG_TO_RAD;
+  }    
+  
+  Vec3 pts[] = this.getAllPointPositions();
+  Mat44 deformSpaceInv = deformSpace.inverse(); 
+
+  TwistTask<<<pts.size()>>>(pts, start, end, lowBound, highBound, deformSpace, deformSpaceInv);
+  
+  this.setAllPointPositions(pts);
+}
+",
+  "requiredPresets" : {
+    "Colorbleed.Deformers.NonLinear.TwistDeformer" : {
+      "objectType" : "Func",
+      "metadata" : {
+        "uiTextColor" : "{\n  \"r\" : 20,\n  \"g\" : 20,\n  \"b\" : 20\n  }",
+        "uiNodeColor" : "{\n  \"r\" : 121,\n  \"g\" : 134,\n  \"b\" : 143\n  }"
+        },
+      "title" : "TwistDeformer",
+      "ports" : [
+        {
+          "objectType" : "Port",
+          "nodePortType" : "IO",
+          "name" : "this",
+          "execPortType" : "IO",
+          "typeSpec" : "PolygonMesh"
+          },
+        {
+          "objectType" : "Port",
+          "nodePortType" : "Out",
+          "defaultValues" : {
+            "Float32" : -90
+            },
+          "name" : "startAngle",
+          "execPortType" : "In",
+          "typeSpec" : "Scalar"
+          },
+        {
+          "objectType" : "Port",
+          "nodePortType" : "Out",
+          "defaultValues" : {
+            "Float32" : 90
+            },
+          "name" : "endAngle",
+          "execPortType" : "In",
+          "typeSpec" : "Scalar"
+          },
+        {
+          "objectType" : "Port",
+          "nodePortType" : "Out",
+          "defaultValues" : {
+            "Float32" : -1
+            },
+          "name" : "lowBound",
+          "execPortType" : "In",
+          "typeSpec" : "Scalar"
+          },
+        {
+          "objectType" : "Port",
+          "nodePortType" : "Out",
+          "defaultValues" : {
+            "Boolean" : true,
+            "Float32" : 1
+            },
+          "name" : "highBound",
+          "execPortType" : "In",
+          "typeSpec" : "Scalar"
+          },
+        {
+          "objectType" : "Port",
+          "nodePortType" : "Out",
+          "name" : "deformSpace",
+          "execPortType" : "In",
+          "typeSpec" : "Mat44"
+          },
+        {
+          "objectType" : "Port",
+          "nodePortType" : "Out",
+          "defaultValues" : {
+            "Boolean" : true
+            },
+          "name" : "asDegrees",
+          "execPortType" : "In",
+          "typeSpec" : "Boolean"
+          }
+        ],
+      "extDeps" : {},
+      "presetGUID" : "622A03E34A53D2380E17FC392ABCFFD1",
+      "code" : "operator TwistTask<<<index>>>(io Vec3 pts[], Scalar startAngle, Scalar endAngle, Scalar lowBound, Scalar highBound, Mat44 deformSpace, Mat44 deformSpaceInv)
+{
+  Vec3 pt = pts[index];
+  Vec3 newPt = pt.clone();
+    
+  // Convert to deformer local space
+  pt = deformSpaceInv * pt;
+
+  // If at exact zero then it won't bend at all. (Odds that this
+  // happens are small!)
+  Scalar height = pt.y;
+  if (height == 0) return;
+  
+  // Limit between start and end bound
+  height = Math_clamp(height, lowBound, highBound);
+  
+  // Percentage between the bounds
+  Scalar percentage = (pt.y - lowBound) / (highBound - lowBound);
+  Scalar angle = (percentage * (endAngle - startAngle)) + startAngle;
+  
+  // Maya does it the exact opposite way, so we reverse our angle
+  angle *= -1;
+  
+  // Reference:
+  // Say you want to rotate a vector or a point in 2D by `b`
+  // x' = x cos b - y sin b
+  // y' = x sin b + y cos b
+  
+  // Rotate the point around local y-axis by angle in 2D
+  newPt.x = pt.x * cos(angle) + pt.z * sin(angle);
+  newPt.z = pt.x * sin(angle) + pt.z * cos(angle);
+  
+  // Convert back to original space
+  newPt = deformSpace * newPt;
+  
+  pts[index] = newPt;
+}
+
+
+dfgEntry {
+
+  if (startAngle == 0.0 && endAngle == 0.0) return;
+  if (lowBound >= highBound) return;
+  
+  Scalar start = startAngle;
+  Scalar end = endAngle;
+  if (asDegrees)
+  { 
+    start *= DEG_TO_RAD;
+    end *= DEG_TO_RAD;
+  }    
+  
+  Vec3 pts[] = this.getAllPointPositions();
+  Mat44 deformSpaceInv = deformSpace.inverse(); 
+
+  TwistTask<<<pts.size()>>>(pts, start, end, lowBound, highBound, deformSpace, deformSpaceInv);
+  
+  this.setAllPointPositions(pts);
+}
+"
+      }
+    }
+  }

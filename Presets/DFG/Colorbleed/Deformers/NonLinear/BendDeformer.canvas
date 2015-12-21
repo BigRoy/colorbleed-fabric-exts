@@ -1,0 +1,254 @@
+{
+  "objectType" : "Func",
+  "title" : "BendDeformer",
+  "ports" : [
+    {
+      "objectType" : "Port",
+      "nodePortType" : "IO",
+      "name" : "this",
+      "execPortType" : "IO",
+      "typeSpec" : "PolygonMesh"
+      },
+    {
+      "objectType" : "Port",
+      "nodePortType" : "Out",
+      "defaultValues" : {
+        "Float32" : 45
+        },
+      "name" : "curvature",
+      "execPortType" : "In",
+      "typeSpec" : "Scalar"
+      },
+    {
+      "objectType" : "Port",
+      "nodePortType" : "Out",
+      "defaultValues" : {
+        "Float32" : -1
+        },
+      "name" : "lowBound",
+      "execPortType" : "In",
+      "typeSpec" : "Scalar"
+      },
+    {
+      "objectType" : "Port",
+      "nodePortType" : "Out",
+      "defaultValues" : {
+        "Float32" : 1
+        },
+      "name" : "highBound",
+      "execPortType" : "In",
+      "typeSpec" : "Scalar"
+      },
+    {
+      "objectType" : "Port",
+      "nodePortType" : "Out",
+      "name" : "deformSpace",
+      "execPortType" : "In",
+      "typeSpec" : "Mat44"
+      },
+    {
+      "objectType" : "Port",
+      "nodePortType" : "Out",
+      "defaultValues" : {
+        "Boolean" : true
+        },
+      "name" : "asDegrees",
+      "execPortType" : "In",
+      "typeSpec" : "Boolean"
+      }
+    ],
+  "extDeps" : {},
+  "presetGUID" : "9FA4D7CD81F93C689FDFB35AB5D76A0D",
+  "code" : "operator BendTask<<<index>>>(io Vec3 pts[], Scalar curvature, Scalar lowBound, Scalar highBound, Mat44 deformSpace, Mat44 deformSpaceInv)
+{
+    Vec3 pt = pts[index];
+    
+    // Convert to deformer local space
+    pt = deformSpaceInv * pt;
+
+    // If at exact zero then it won't bend at all. (Odds that this
+    // happens are small!)
+    if (pt.y == 0.0)
+        return;
+
+    // Calculate the new point after the bend
+    Scalar x = pt.x;
+    Scalar y = pt.y;
+    Scalar r = 1 / curvature;  // bend radius
+    Scalar y_clamped = Math_clamp(y, lowBound, highBound);
+    Scalar yr = y_clamped * curvature; // bend at point y
+
+    // Compute bend positional change
+    Scalar c = cos(PI - yr);
+    Scalar s = sin(PI - yr);
+    Scalar px = (r * c) + r - (x * c);
+    Scalar py = (r * s) - (x * s);
+
+    // If beyond the ends of the high/low bounds
+    // extend positional deformation in the direction
+    // of the end of the bend.
+    if (y > highBound)
+    {
+      py += -c * (y - highBound);
+      px += s * (y - highBound);
+    }
+    else if (y < lowBound)
+    {
+      py += -c * (y - lowBound);
+      px += s * (y - lowBound);
+    }     
+    
+    pt = Vec3(px, py, pt.z);
+    pt = deformSpace * pt;
+        
+    pts[index] = pt;
+}
+
+
+dfgEntry {
+
+
+  if (curvature == 0) return;
+  if (lowBound >= highBound) return; 
+    
+  Vec3 pts[] = this.getAllPointPositions();
+  Scalar c = curvature;
+  if (asDegrees)
+    c *= DEG_TO_RAD;
+       
+  Mat44 deformSpaceInv = deformSpace.inverse(); 
+
+  BendTask<<<pts.size()>>>(pts, c, lowBound, highBound, deformSpace, deformSpaceInv);
+  
+  this.setAllPointPositions(pts);
+}
+",
+  "requiredPresets" : {
+    "Colorbleed.Deformers.NonLinear.BendDeformer" : {
+      "objectType" : "Func",
+      "title" : "BendDeformer",
+      "ports" : [
+        {
+          "objectType" : "Port",
+          "nodePortType" : "IO",
+          "name" : "this",
+          "execPortType" : "IO",
+          "typeSpec" : "PolygonMesh"
+          },
+        {
+          "objectType" : "Port",
+          "nodePortType" : "Out",
+          "defaultValues" : {
+            "Float32" : 45
+            },
+          "name" : "curvature",
+          "execPortType" : "In",
+          "typeSpec" : "Scalar"
+          },
+        {
+          "objectType" : "Port",
+          "nodePortType" : "Out",
+          "defaultValues" : {
+            "Float32" : -1
+            },
+          "name" : "lowBound",
+          "execPortType" : "In",
+          "typeSpec" : "Scalar"
+          },
+        {
+          "objectType" : "Port",
+          "nodePortType" : "Out",
+          "defaultValues" : {
+            "Float32" : 1
+            },
+          "name" : "highBound",
+          "execPortType" : "In",
+          "typeSpec" : "Scalar"
+          },
+        {
+          "objectType" : "Port",
+          "nodePortType" : "Out",
+          "name" : "deformSpace",
+          "execPortType" : "In",
+          "typeSpec" : "Mat44"
+          },
+        {
+          "objectType" : "Port",
+          "nodePortType" : "Out",
+          "defaultValues" : {
+            "Boolean" : true
+            },
+          "name" : "asDegrees",
+          "execPortType" : "In",
+          "typeSpec" : "Boolean"
+          }
+        ],
+      "extDeps" : {},
+      "presetGUID" : "9FA4D7CD81F93C689FDFB35AB5D76A0D",
+      "code" : "operator BendTask<<<index>>>(io Vec3 pts[], Scalar curvature, Scalar lowBound, Scalar highBound, Mat44 deformSpace, Mat44 deformSpaceInv)
+{
+    Vec3 pt = pts[index];
+    
+    // Convert to deformer local space
+    pt = deformSpaceInv * pt;
+
+    // If at exact zero then it won't bend at all. (Odds that this
+    // happens are small!)
+    if (pt.y == 0.0)
+        return;
+
+    // Calculate the new point after the bend
+    Scalar x = pt.x;
+    Scalar y = pt.y;
+    Scalar r = 1 / curvature;  // bend radius
+    Scalar y_clamped = Math_clamp(y, lowBound, highBound);
+    Scalar yr = y_clamped * curvature; // bend at point y
+
+    // Compute bend positional change
+    Scalar c = cos(PI - yr);
+    Scalar s = sin(PI - yr);
+    Scalar px = (r * c) + r - (x * c);
+    Scalar py = (r * s) - (x * s);
+
+    // If beyond the ends of the high/low bounds
+    // extend positional deformation in the direction
+    // of the end of the bend.
+    if (y > highBound)
+    {
+      py += -c * (y - highBound);
+      px += s * (y - highBound);
+    }
+    else if (y < lowBound)
+    {
+      py += -c * (y - lowBound);
+      px += s * (y - lowBound);
+    }     
+    
+    pt = Vec3(px, py, pt.z);
+    pt = deformSpace * pt;
+        
+    pts[index] = pt;
+}
+
+
+dfgEntry {
+
+
+  if (curvature == 0) return;
+  if (lowBound >= highBound) return; 
+    
+  Vec3 pts[] = this.getAllPointPositions();
+  Scalar c = curvature;
+  if (asDegrees)
+    c *= DEG_TO_RAD;
+       
+  Mat44 deformSpaceInv = deformSpace.inverse(); 
+
+  BendTask<<<pts.size()>>>(pts, c, lowBound, highBound, deformSpace, deformSpaceInv);
+  
+  this.setAllPointPositions(pts);
+}
+"
+      }
+    }
+  }
