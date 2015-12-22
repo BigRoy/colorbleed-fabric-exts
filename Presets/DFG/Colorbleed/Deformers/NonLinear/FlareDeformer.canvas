@@ -1,0 +1,258 @@
+{
+  "objectType" : "Func",
+  "metadata" : {
+    "uiTextColor" : "{\n  \"r\" : 20,\n  \"g\" : 20,\n  \"b\" : 20\n  }",
+    "uiNodeColor" : "{\n  \"r\" : 121,\n  \"g\" : 134,\n  \"b\" : 143\n  }"
+    },
+  "title" : "FlareDeformer",
+  "ports" : [
+    {
+      "objectType" : "Port",
+      "nodePortType" : "IO",
+      "name" : "this",
+      "execPortType" : "IO",
+      "typeSpec" : "PolygonMesh"
+      },
+    {
+      "objectType" : "Port",
+      "nodePortType" : "Out",
+      "defaultValues" : {
+        "Float32" : -90,
+        "Vec2" : {
+          "x" : 1,
+          "y" : 1
+          }
+        },
+      "name" : "startFlare",
+      "execPortType" : "In",
+      "typeSpec" : "Vec2"
+      },
+    {
+      "objectType" : "Port",
+      "nodePortType" : "Out",
+      "defaultValues" : {
+        "Float32" : 90,
+        "Vec2" : {
+          "x" : 1,
+          "y" : 1
+          }
+        },
+      "name" : "endFlare",
+      "execPortType" : "In",
+      "typeSpec" : "Vec2"
+      },
+    {
+      "objectType" : "Port",
+      "nodePortType" : "Out",
+      "defaultValues" : {
+        "Float32" : 0
+        },
+      "name" : "curve",
+      "execPortType" : "In",
+      "typeSpec" : "Scalar"
+      },
+    {
+      "objectType" : "Port",
+      "nodePortType" : "Out",
+      "defaultValues" : {
+        "Boolean" : true,
+        "Float32" : -1
+        },
+      "name" : "lowBound",
+      "execPortType" : "In",
+      "typeSpec" : "Scalar"
+      },
+    {
+      "objectType" : "Port",
+      "nodePortType" : "Out",
+      "defaultValues" : {
+        "Float32" : 1
+        },
+      "name" : "highBound",
+      "execPortType" : "In",
+      "typeSpec" : "Scalar"
+      },
+    {
+      "objectType" : "Port",
+      "nodePortType" : "Out",
+      "defaultValues" : {
+        "Boolean" : true
+        },
+      "name" : "deformSpace",
+      "execPortType" : "In",
+      "typeSpec" : "Mat44"
+      }
+    ],
+  "extDeps" : {},
+  "presetGUID" : "227EBECEE7F7FD86D0B3DCDE5D49B3D9",
+  "code" : "operator FlareDeformTask<<<index>>>(io Vec3 pts[], Vec2 startFlare, Vec2 endFlare, Scalar curve, Scalar lowBound, Scalar highBound, Mat44 deformSpace, Mat44 deformSpaceInv)
+{
+  Vec3 pt = pts[index];
+    
+  // Convert to deformer local space
+  pt = deformSpaceInv * pt;
+  
+  // Percentage between the bounds
+  Scalar percentage = (pt.y - lowBound) / (highBound - lowBound);
+  percentage = Math_clamp(percentage, 0.0, 1.0);
+  
+  // Amount of distance effect from start and end flare.
+  Scalar endAmp = percentage;
+  Scalar startAmp = 1 - percentage;
+  
+  // The curve affects everything at the center between low-high bound
+  // with a inverse square falloff towards the ends.
+  Scalar curveAmp = 1.0 -  pow(abs(2.0 * (percentage - 0.5)), 2);
+  
+  pt.x *= (startFlare.x * startAmp) + (endFlare.x * endAmp) + (curveAmp * curve);
+  pt.z *= (startFlare.y * startAmp) + (endFlare.y * endAmp) + (curveAmp * curve);
+  
+  // Convert back to original space
+  pt = deformSpace * pt;
+  pts[index] = pt;
+}
+
+
+dfgEntry {
+
+  if (startFlare == Vec2(1.0, 1.0) && endFlare == Vec2(1.0, 1.0) && curve == 0.0)  return;
+  
+  Vec3 pts[] = this.getAllPointPositions();
+  Mat44 deformSpaceInv = deformSpace.inverse(); 
+
+  FlareDeformTask<<<pts.size()>>>(pts, startFlare, endFlare, curve, lowBound, highBound, deformSpace, deformSpaceInv);
+  
+  this.setAllPointPositions(pts);
+}
+",
+  "requiredPresets" : {
+    "Colorbleed.Deformers.NonLinear.FlareDeformer" : {
+      "objectType" : "Func",
+      "metadata" : {
+        "uiTextColor" : "{\n  \"r\" : 20,\n  \"g\" : 20,\n  \"b\" : 20\n  }",
+        "uiNodeColor" : "{\n  \"r\" : 121,\n  \"g\" : 134,\n  \"b\" : 143\n  }"
+        },
+      "title" : "FlareDeformer",
+      "ports" : [
+        {
+          "objectType" : "Port",
+          "nodePortType" : "IO",
+          "name" : "this",
+          "execPortType" : "IO",
+          "typeSpec" : "PolygonMesh"
+          },
+        {
+          "objectType" : "Port",
+          "nodePortType" : "Out",
+          "defaultValues" : {
+            "Float32" : -90,
+            "Vec2" : {
+              "x" : 1,
+              "y" : 1
+              }
+            },
+          "name" : "startFlare",
+          "execPortType" : "In",
+          "typeSpec" : "Vec2"
+          },
+        {
+          "objectType" : "Port",
+          "nodePortType" : "Out",
+          "defaultValues" : {
+            "Float32" : 90,
+            "Vec2" : {
+              "x" : 1,
+              "y" : 1
+              }
+            },
+          "name" : "endFlare",
+          "execPortType" : "In",
+          "typeSpec" : "Vec2"
+          },
+        {
+          "objectType" : "Port",
+          "nodePortType" : "Out",
+          "defaultValues" : {
+            "Float32" : 0
+            },
+          "name" : "curve",
+          "execPortType" : "In",
+          "typeSpec" : "Scalar"
+          },
+        {
+          "objectType" : "Port",
+          "nodePortType" : "Out",
+          "defaultValues" : {
+            "Boolean" : true,
+            "Float32" : -1
+            },
+          "name" : "lowBound",
+          "execPortType" : "In",
+          "typeSpec" : "Scalar"
+          },
+        {
+          "objectType" : "Port",
+          "nodePortType" : "Out",
+          "defaultValues" : {
+            "Float32" : 1
+            },
+          "name" : "highBound",
+          "execPortType" : "In",
+          "typeSpec" : "Scalar"
+          },
+        {
+          "objectType" : "Port",
+          "nodePortType" : "Out",
+          "defaultValues" : {
+            "Boolean" : true
+            },
+          "name" : "deformSpace",
+          "execPortType" : "In",
+          "typeSpec" : "Mat44"
+          }
+        ],
+      "extDeps" : {},
+      "presetGUID" : "227EBECEE7F7FD86D0B3DCDE5D49B3D9",
+      "code" : "operator FlareDeformTask<<<index>>>(io Vec3 pts[], Vec2 startFlare, Vec2 endFlare, Scalar curve, Scalar lowBound, Scalar highBound, Mat44 deformSpace, Mat44 deformSpaceInv)
+{
+  Vec3 pt = pts[index];
+    
+  // Convert to deformer local space
+  pt = deformSpaceInv * pt;
+  
+  // Percentage between the bounds
+  Scalar percentage = (pt.y - lowBound) / (highBound - lowBound);
+  percentage = Math_clamp(percentage, 0.0, 1.0);
+  
+  // Amount of distance effect from start and end flare.
+  Scalar endAmp = percentage;
+  Scalar startAmp = 1 - percentage;
+  
+  // The curve affects everything at the center between low-high bound
+  // with a inverse square falloff towards the ends.
+  Scalar curveAmp = 1.0 -  pow(abs(2.0 * (percentage - 0.5)), 2);
+  
+  pt.x *= (startFlare.x * startAmp) + (endFlare.x * endAmp) + (curveAmp * curve);
+  pt.z *= (startFlare.y * startAmp) + (endFlare.y * endAmp) + (curveAmp * curve);
+  
+  // Convert back to original space
+  pt = deformSpace * pt;
+  pts[index] = pt;
+}
+
+
+dfgEntry {
+
+  if (startFlare == Vec2(1.0, 1.0) && endFlare == Vec2(1.0, 1.0) && curve == 0.0)  return;
+  
+  Vec3 pts[] = this.getAllPointPositions();
+  Mat44 deformSpaceInv = deformSpace.inverse(); 
+
+  FlareDeformTask<<<pts.size()>>>(pts, startFlare, endFlare, curve, lowBound, highBound, deformSpace, deformSpaceInv);
+  
+  this.setAllPointPositions(pts);
+}
+"
+      }
+    }
+  }
